@@ -1,0 +1,23 @@
+﻿#root {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
+}
+
+th, td {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.app {
+    display: flex;
+    height: 100vh;
+}
+
+.main-content {
+    margin-left: 375px; /* Match the width of the navigation */
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
