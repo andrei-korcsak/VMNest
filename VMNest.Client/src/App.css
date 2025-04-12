@@ -1,13 +1,12 @@
 ﻿#root {
     max-width: 1280px;
     margin: 0 auto;
-    padding: 2rem;
     text-align: center;
 }
 
 body {
     font-family: Arial, sans-serif;
-    background-color: white;
+    background-color: #F4F4F4;
     margin: 0;
     padding: 0;
 }
@@ -23,8 +22,14 @@ th, td {
 }
 
 .main-content {
-    margin-left: 375px; /* Match the width of the navigation */
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+    position: absolute;
+    top: calc(12.5% + 25px); /* Add 15px margin from the top */
+    left: calc(375px + 25px); /* Add 15px margin from the left */
+    right: 25px; /* Add 15px margin from the right */
+    bottom: 25px; /* Add 15px margin from the bottom */
+    background-color: white; /* Optional: Set a background color */
+    border-radius: 15px; /* Optional: Add rounded corners */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow */
+    box-sizing: border-box; /* Ensure padding doesn't affect dimensions */
+    overflow: auto; /* Handle content overflow */
 }

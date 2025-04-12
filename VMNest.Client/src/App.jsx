@@ -13,8 +13,10 @@ function App() {
     return (
         <div className="app">
             <NavigationComponent onOptionSelect={handleOptionSelect} />
+            <HeaderComponent title={selectedOption} />
+
             <div className="main-content">
-                <HeaderComponent title={selectedOption} />
+
             </div>
         </div>
     );
