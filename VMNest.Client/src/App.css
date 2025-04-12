@@ -28,6 +28,7 @@ th, td {
     right: 25px; /* Add 15px margin from the right */
     bottom: 25px; /* Add 15px margin from the bottom */
     background-color: white; /* Optional: Set a background color */
+    color: black;
     border-radius: 15px; /* Optional: Add rounded corners */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow */
     box-sizing: border-box; /* Ensure padding doesn't affect dimensions */
