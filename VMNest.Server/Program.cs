@@ -7,6 +7,16 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowPolicy",
+        policyBuilder => {
+            policyBuilder.WithOrigins("https://localhost:64357", "http://localhost:64357");
+            policyBuilder.AllowAnyMethod();
+            policyBuilder.AllowAnyHeader();
+        });
+});
+
 var app = builder.Build();
 
 app.UseDefaultFiles();
@@ -19,7 +29,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+app.UseCors("AllowPolicy");
 
 app.UseAuthorization();
 

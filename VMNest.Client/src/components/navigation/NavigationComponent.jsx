@@ -7,7 +7,7 @@ import DashboardIcon from '../../images/dashboard_icon.png';
 import SettingsIcon from '../../images/settings_icon.png';
 import SignOutIcon from '../../images/sign_out_icon.png';
 
-function NavigationComponent() {
+function NavigationComponent({ onOptionSelect }) {
     const navigate = useNavigate();
 
     const options = [
@@ -17,11 +17,12 @@ function NavigationComponent() {
         { label: 'Sign Out', icon: SignOutIcon, path: null },
     ];
 
-    const handleNavigation = (path) => {
-        if (path) {
-            navigate(path); // Navigate to the specified path
-        } else {
-            console.log('Signing out...'); // Handle sign-out logic here
+    const handleNavigation = (option) => {
+        if (option.path) {
+            navigate(option.path); // Navigate to the specified path
+        }
+        if (onOptionSelect) {
+            onOptionSelect(option.label); // Update the header title
         }
     };
 
@@ -37,7 +38,7 @@ function NavigationComponent() {
                     <div
                         key={option.label}
                         className="navigation-option"
-                        onClick={() => handleNavigation(option.path)}
+                        onClick={() => handleNavigation(option)}
                     >
                         <img src={option.icon} alt={`${option.label} Icon`} className="navigation-icon" />
                         {option.label}

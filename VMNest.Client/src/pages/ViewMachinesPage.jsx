@@ -1,7 +1,40 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './ViewMachinesPage.css';
+import axios from 'axios'; // Optional: Use fetch if axios is not installed
 
 function ViewMachinesPage() {
+    const [machines, setMachines] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        // Fetch data from the API when the component loads
+        const fetchMachines = async () => {
+            try {
+                const response = await axios.get('http://localhost:5063/api/ViewMachines/ips-and-macs', {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                }); 
+                setMachines(response.data);
+            } catch (err) {
+                setError('Failed to fetch machines data.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchMachines(); // Call the function
+    }, []);
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    if (error) {
+        return <div className="error">{error}</div>;
+    }
+
     return (
         <div className="view-machines-page">
             <div className="view-machines-top-section">
@@ -19,34 +52,20 @@ function ViewMachinesPage() {
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Name</th>
-                            <th>Status</th>
+                            <th>IP Address</th>
+                            <th>MAC Address</th>
                             <th>Type</th>
-                            <th>Last Updated</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Machine A</td>
-                            <td>Active</td>
-                            <td>Type 1</td>
-                            <td>2025-04-12</td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Machine B</td>
-                            <td>Inactive</td>
-                            <td>Type 2</td>
-                            <td>2025-04-10</td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td>Machine C</td>
-                            <td>Active</td>
-                            <td>Type 1</td>
-                            <td>2025-04-11</td>
-                        </tr>
+                        {machines.map((machine, index) => (
+                            <tr key={index}>
+                                <td>{index + 1}</td>
+                                <td>{machine.ip}</td>
+                                <td>{machine.macAddress}</td>
+                                <td>{machine.type}</td>
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
             </div>
