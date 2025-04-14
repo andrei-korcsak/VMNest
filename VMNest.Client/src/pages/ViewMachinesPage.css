@@ -7,6 +7,18 @@
     align-items: center;
     justify-content: flex-start;
     margin-bottom: 20px;
+    gap: 10px;
+}
+
+.view-machines-search-bar {
+    padding: 15px 20px;
+    font-size: 16px;
+    background-color: #f9f9f9;
+    color: black;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    width: 300px;
+    box-sizing: border-box;
 }
 
 .view-machines-button {
@@ -22,16 +34,6 @@
 
 .view-machines-button:hover {
     background-color: #45a049;
-}
-
-.view-machines-filter {
-    padding: 15px 20px; 
-    border: 1px solid #ccc;
-    border-radius: 8px; 
-    font-size: 16px; 
-    height: auto; 
-    cursor: pointer; 
-    margin-right: 10px; 
 }
 
 .view-machines-divider {

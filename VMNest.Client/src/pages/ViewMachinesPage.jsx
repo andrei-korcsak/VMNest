@@ -4,10 +4,12 @@ import axios from 'axios';
 
 function ViewMachinesPage() {  
    const [machines, setMachines] = useState([]);  
+   const [filteredMachines, setFilteredMachines] = useState([]); // For search results
    const [loading, setLoading] = useState(true);  
    const [error, setError] = useState(null);  
    const [currentPage, setCurrentPage] = useState(1);  
    const [totalPages, setTotalPages] = useState(1);  
+   const [searchQuery, setSearchQuery] = useState(''); // Search query state
    const pageSize = 10;  
 
    useEffect(() => {  
@@ -26,6 +28,7 @@ function ViewMachinesPage() {
                const fetchedMachines = response.data.items;  
                const paddedMachines = Array.from({ length: pageSize }, (_, i) => fetchedMachines[i] || null);  
                setMachines(paddedMachines);  
+               setFilteredMachines(paddedMachines); // Initialize filtered machines
                setTotalPages(response.data.totalPages);  
            } catch (err) {  
                setError('Failed to fetch machines data.');  
@@ -36,6 +39,19 @@ function ViewMachinesPage() {
 
        fetchMachines();  
    }, [currentPage]);  
+
+   const handleSearch = (e) => {  
+       const query = e.target.value.toLowerCase();  
+       setSearchQuery(query);  
+       const filtered = machines.filter((machine) =>  
+           machine && (  
+               machine.ip.toLowerCase().includes(query) ||  
+               machine.macAddress.toLowerCase().includes(query) ||  
+               machine.name.toLowerCase().includes(query)  
+           )  
+       );  
+       setFilteredMachines(filtered);  
+   };  
 
    const handlePreviousPage = () => {  
        if (currentPage > 1) {  
@@ -60,13 +76,15 @@ function ViewMachinesPage() {
    return (  
        <div className="view-machines-page">  
            <div className="view-machines-top-section">  
+               <input  
+                   type="text"  
+                   placeholder="Search by IP, MAC, or DNS Name"  
+                   value={searchQuery}  
+                   onChange={handleSearch}  
+                   className="view-machines-search-bar"  
+               />  
                <button className="view-machines-button">Add Machine</button>  
                <button className="view-machines-button">Remove Machine</button>  
-               <select className="view-machines-filter">  
-                   <option value="all">All</option>  
-                   <option value="active">Active</option>  
-                   <option value="inactive">Inactive</option>  
-               </select>  
            </div>  
            <hr className="view-machines-divider" />  
            <div className="view-machines-content">  
@@ -76,11 +94,11 @@ function ViewMachinesPage() {
                            <th>ID</th>  
                            <th>IP Address</th>  
                            <th>MAC Address</th>  
-                           <th>DNS Name</th>
+                           <th>DNS Name</th>  
                        </tr>  
                    </thead>  
                    <tbody>  
-                       {machines.map((machine, index) => (  
+                       {filteredMachines.map((machine, index) => (  
                            <tr key={index}>  
                                <td>{index + 1 + (currentPage - 1) * pageSize}</td>  
                                <td>{machine ? machine.ip : ''}</td>  
