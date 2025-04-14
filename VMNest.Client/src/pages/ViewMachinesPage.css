@@ -126,24 +126,45 @@ background-color: #f9f9f9;
 
 .pagination {
     display: flex;
-    justify-content: center; /* Centers the pagination controls horizontally */
+    justify-content: center;
     align-items: center;
-    margin-top: 20px; /* Adds space between the table and pagination */
-    position: relative;
-    bottom: -50px; /* Moves the pagination lower */
+    margin-top: 20px;
+    gap: 5px;
 }
 
-.pagination-button {
-    padding: 10px 20px;
-    margin: 0 5px;
-    background-color: #007bff;
-    color: white;
+.pagination-arrow {
+    background-color: transparent; /* Transparent background */
+    color: #007bff; /* Blue color for arrows */
     border: none;
-    border-radius: 5px;
+    padding: 10px 15px;
     cursor: pointer;
+    font-size: 16px;
 }
 
-.pagination-button:disabled {
-    background-color: #cccccc;
+.pagination-arrow:hover {
+    color: gray; /* Change arrow color to gray on hover */
+}
+
+.pagination-arrow:disabled {
+    color: #cccccc; /* Gray color for disabled arrows */
     cursor: not-allowed;
+}
+
+.pagination-number {
+    background-color: transparent; /* Transparent background */
+    color: #007bff; /* Blue color for numbers */
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 16px;
+    text-decoration: underline; /* Underline like a link */
+}
+
+.pagination-number.active {
+    font-weight: bold; /* Bold for the active page */
+    text-decoration: none; /* Remove underline for the active page */
+}
+
+.pagination-number:hover {
+    color: #0056b3; /* Darker blue on hover */
 }

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './ViewMachinesPage.css';  
 import axios from 'axios';  
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash, faSync, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faSync, faSpinner, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 function ViewMachinesPage() {  
    const [machines, setMachines] = useState([]);  
    const [filteredMachines, setFilteredMachines] = useState([]);  
@@ -56,6 +56,10 @@ function ViewMachinesPage() {
        );  
        setFilteredMachines(filtered);  
    };  
+
+    const handlePageClick = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
 
    const handlePreviousPage = () => {  
        if (currentPage > 1) {  
@@ -162,23 +166,31 @@ function ViewMachinesPage() {
                    </tbody>  
                </table>  
            </div>  
-           <div className="pagination">  
-               <button  
-                   className="pagination-button"  
-                   onClick={handlePreviousPage}  
-                   disabled={currentPage === 1}  
-               >  
-                   Previous  
-               </button>  
-               <span>Page {currentPage} of {totalPages}</span>  
-               <button  
-                   className="pagination-button"  
-                   onClick={handleNextPage}  
-                   disabled={currentPage === totalPages}  
-               >  
-                   Next  
-               </button>  
-           </div>  
+           <div className="pagination">
+               <button
+                   className="pagination-arrow"
+                   onClick={handlePreviousPage}
+                   disabled={currentPage === 1}
+               >
+                   <FontAwesomeIcon icon={faChevronLeft} />
+               </button>
+               {Array.from({ length: totalPages }, (_, i) => (
+                   <button
+                       key={i + 1}
+                       className={`pagination-number ${currentPage === i + 1 ? 'active' : ''}`}
+                       onClick={() => handlePageClick(i + 1)}
+                   >
+                       {i + 1}
+                   </button>
+               ))}
+               <button
+                   className="pagination-arrow"
+                   onClick={handleNextPage}
+                   disabled={currentPage === totalPages}
+               >
+                   <FontAwesomeIcon icon={faChevronRight} />
+               </button>
+           </div>
        </div>  
    );  
 }  
