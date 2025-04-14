@@ -144,7 +144,7 @@ public partial class IpNetTable
         }
     }
 
-    public List<MachineModel> GetIpsAndMacs()
+    public (List<MachineModel> Items, int TotalPages) GetIpsAndMacs(int page, int pageSize)
     {
         List<MachineModel> result = new List<MachineModel>();
 
@@ -165,7 +165,6 @@ public partial class IpNetTable
         // that it is released.
         IntPtr buffer = IntPtr.Zero;
 
-        // Try/finally.
         try
         {
             // Allocate the memory.
@@ -201,7 +200,7 @@ public partial class IpNetTable
                     IntPtr(currentBuffer.ToInt64() + (index *
                     Marshal.SizeOf<MIB_IPNETROW>())), typeof(MIB_IPNETROW));
 
-                if(aRow != null)
+                if (aRow != null)
                 {
                     table[index] = (MIB_IPNETROW)aRow;
                 }
@@ -222,10 +221,9 @@ public partial class IpNetTable
                     mac[3] = ToHexa(row.mac3);
                     mac[4] = ToHexa(row.mac4);
                     mac[5] = ToHexa(row.mac5);
-             
+
                     result.Add(new MachineModel
                     {
-                        //Name = ip.ToString(), //TryDnsResolve(ip),
                         Ip = new IPAddress(BitConverter.GetBytes(row.dwAddr)).ToString(),
                         MacAddress = string.Join(":", mac),
                         Type = row.dwType.ToString()
@@ -239,6 +237,15 @@ public partial class IpNetTable
             FreeMibTable(buffer);
         }
 
-        return result;
+        // Pagination logic
+        int totalItems = result.Count;
+        int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+        var paginatedResult = result
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        return (paginatedResult, totalPages);
     }
 }

@@ -14,17 +14,10 @@ namespace VMNest.Server.Controllers
         }
 
         [HttpGet("ips-and-macs")]
-        public IActionResult GetIpsAndMacs()
+        public IActionResult GetIpsAndMacs([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
-            try
-            {
-                var result = _ipNetTable.GetIpsAndMacs();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            var (items, totalPages) = _ipNetTable.GetIpsAndMacs(page, pageSize);
+            return Ok(new { items, totalPages });
         }
     }
 }

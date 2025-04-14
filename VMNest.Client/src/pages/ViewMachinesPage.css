@@ -68,3 +68,27 @@
 .view-machines-table tr:hover {
     background-color: #f1f1f1;
 }
+
+.pagination {
+    display: flex;
+    justify-content: center; /* Centers the pagination controls horizontally */
+    align-items: center;
+    margin-top: 20px; /* Adds space between the table and pagination */
+    position: relative;
+    bottom: -50px; /* Moves the pagination lower */
+}
+
+.pagination-button {
+    padding: 10px 20px;
+    margin: 0 5px; 
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.pagination-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
