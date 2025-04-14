@@ -4,12 +4,14 @@ import axios from 'axios';
 
 function ViewMachinesPage() {  
    const [machines, setMachines] = useState([]);  
-   const [filteredMachines, setFilteredMachines] = useState([]); // For search results
+   const [filteredMachines, setFilteredMachines] = useState([]);  
    const [loading, setLoading] = useState(true);  
    const [error, setError] = useState(null);  
    const [currentPage, setCurrentPage] = useState(1);  
    const [totalPages, setTotalPages] = useState(1);  
-   const [searchQuery, setSearchQuery] = useState(''); // Search query state
+   const [searchQuery, setSearchQuery] = useState('');  
+   const [selectedMachines, setSelectedMachines] = useState([]);  
+   const [selectAll, setSelectAll] = useState(false);  
    const pageSize = 10;  
 
    useEffect(() => {  
@@ -28,7 +30,7 @@ function ViewMachinesPage() {
                const fetchedMachines = response.data.items;  
                const paddedMachines = Array.from({ length: pageSize }, (_, i) => fetchedMachines[i] || null);  
                setMachines(paddedMachines);  
-               setFilteredMachines(paddedMachines); // Initialize filtered machines
+               setFilteredMachines(paddedMachines);  
                setTotalPages(response.data.totalPages);  
            } catch (err) {  
                setError('Failed to fetch machines data.');  
@@ -65,6 +67,28 @@ function ViewMachinesPage() {
        }  
    };  
 
+   const handleSelectAll = () => {  
+       const newSelectAll = !selectAll;  
+       setSelectAll(newSelectAll);  
+       if (newSelectAll) {  
+           setSelectedMachines(filteredMachines.filter((machine) => machine));  
+       } else {  
+           setSelectedMachines([]);  
+       }  
+   };  
+
+   const handleCheckboxChange = (machine) => {  
+       if (selectedMachines.includes(machine)) {  
+           setSelectedMachines(selectedMachines.filter((m) => m !== machine));  
+       } else {  
+           setSelectedMachines([...selectedMachines, machine]);  
+       }  
+   };  
+
+   const handleActionButtonClick = () => {  
+       alert(`Performing action on ${selectedMachines.length} selected machines.`);  
+   };  
+
    if (loading) {  
        return <div>Loading...</div>;  
    }  
@@ -85,12 +109,26 @@ function ViewMachinesPage() {
                />  
                <button className="view-machines-button">Add Machine</button>  
                <button className="view-machines-button">Remove Machine</button>  
+               <button  
+                   className="view-machines-button"  
+                   onClick={handleActionButtonClick}  
+                   disabled={selectedMachines.length === 0}  
+               >  
+                   Perform Action  
+               </button>  
            </div>  
            <hr className="view-machines-divider" />  
            <div className="view-machines-content">  
                <table className="view-machines-table">  
                    <thead>  
                        <tr>  
+                           <th>  
+                               <input  
+                                   type="checkbox"  
+                                   checked={selectAll}  
+                                   onChange={handleSelectAll}  
+                               />  
+                           </th>  
                            <th>ID</th>  
                            <th>IP Address</th>  
                            <th>MAC Address</th>  
@@ -100,6 +138,13 @@ function ViewMachinesPage() {
                    <tbody>  
                        {filteredMachines.map((machine, index) => (  
                            <tr key={index}>  
+                               <td>  
+                                   <input  
+                                       type="checkbox"  
+                                       checked={selectedMachines.includes(machine)}  
+                                       onChange={() => handleCheckboxChange(machine)}  
+                                   />  
+                               </td>  
                                <td>{index + 1 + (currentPage - 1) * pageSize}</td>  
                                <td>{machine ? machine.ip : ''}</td>  
                                <td>{machine ? machine.macAddress : ''}</td>  
