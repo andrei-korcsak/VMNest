@@ -1,42 +1,46 @@
 import React, { useEffect, useState } from 'react';  
 import './ViewMachinesPage.css';  
 import axios from 'axios';  
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash, faSync, faSpinner, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 function ViewMachinesPage() {  
    const [machines, setMachines] = useState([]);  
-   const [filteredMachines, setFilteredMachines] = useState([]); // For search results
+   const [filteredMachines, setFilteredMachines] = useState([]);  
    const [loading, setLoading] = useState(true);  
    const [error, setError] = useState(null);  
    const [currentPage, setCurrentPage] = useState(1);  
    const [totalPages, setTotalPages] = useState(1);  
-   const [searchQuery, setSearchQuery] = useState(''); // Search query state
+   const [searchQuery, setSearchQuery] = useState('');  
+   const [selectedMachines, setSelectedMachines] = useState([]);  
+   const [selectAll, setSelectAll] = useState(false);  
    const pageSize = 10;  
 
-   useEffect(() => {  
-       const fetchMachines = async () => {  
-           setLoading(true);  
-           try {  
-               const response = await axios.get(`http://localhost:5063/api/ViewMachines/ips-and-macs`, {  
-                   params: {  
-                       page: currentPage,  
-                       pageSize: pageSize,  
-                   },  
-                   headers: {  
-                       'Content-Type': 'application/json',  
-                   },  
-               });  
-               const fetchedMachines = response.data.items;  
-               const paddedMachines = Array.from({ length: pageSize }, (_, i) => fetchedMachines[i] || null);  
-               setMachines(paddedMachines);  
-               setFilteredMachines(paddedMachines); // Initialize filtered machines
-               setTotalPages(response.data.totalPages);  
-           } catch (err) {  
-               setError('Failed to fetch machines data.');  
-           } finally {  
-               setLoading(false);  
-           }  
-       };  
+    const fetchMachines = async (updateTableOnly = false) => {
+        if (!updateTableOnly) setLoading(true);
+        if (updateTableOnly) setFilteredMachines([]); // Clear the table during refresh  
+        try {
+            const response = await axios.get(`http://localhost:5063/api/ViewMachines/ips-and-macs`, {
+                params: {
+                    page: currentPage,
+                    pageSize: pageSize,
+                },
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            const fetchedMachines = response.data.items;
+            const paddedMachines = Array.from({ length: pageSize }, (_, i) => fetchedMachines[i] || null);
+            setMachines(paddedMachines);
+            setFilteredMachines(paddedMachines);
+            setTotalPages(response.data.totalPages);
+        } catch (err) {
+            setError('Failed to fetch machines data.');
+        } finally {
+            if (!updateTableOnly) setLoading(false);
+        }
+    };  
 
+    useEffect(() => {  
        fetchMachines();  
    }, [currentPage]);  
 
@@ -53,6 +57,10 @@ function ViewMachinesPage() {
        setFilteredMachines(filtered);  
    };  
 
+    const handlePageClick = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
+
    const handlePreviousPage = () => {  
        if (currentPage > 1) {  
            setCurrentPage(currentPage - 1);  
@@ -65,9 +73,36 @@ function ViewMachinesPage() {
        }  
    };  
 
-   if (loading) {  
-       return <div>Loading...</div>;  
-   }  
+   const handleSelectAll = () => {  
+       const newSelectAll = !selectAll;  
+       setSelectAll(newSelectAll);  
+       if (newSelectAll) {  
+           setSelectedMachines(filteredMachines.filter((machine) => machine));  
+       } else {  
+           setSelectedMachines([]);  
+       }  
+   };  
+
+   const handleCheckboxChange = (machine) => {  
+       if (selectedMachines.includes(machine)) {  
+           setSelectedMachines(selectedMachines.filter((m) => m !== machine));  
+       } else {  
+           setSelectedMachines([...selectedMachines, machine]);  
+       }  
+   };  
+
+   const handleActionButtonClick = () => {  
+       alert(`Performing action on ${selectedMachines.length} selected machines.`);  
+   };  
+
+    if (loading) {
+        return (
+            <div className="loading-container">
+                <FontAwesomeIcon icon={faSpinner} spin size="3x" />
+                <p>Loading...</p>
+            </div>
+        );
+    }  
 
    if (error) {  
        return <div className="error">{error}</div>;  
@@ -83,14 +118,29 @@ function ViewMachinesPage() {
                    onChange={handleSearch}  
                    className="view-machines-search-bar"  
                />  
-               <button className="view-machines-button">Add Machine</button>  
-               <button className="view-machines-button">Remove Machine</button>  
+               <button
+                   className={`view-machines-delete-button ${selectedMachines.length === 0 ? 'disabled' : ''}`}  
+                   onClick={handleActionButtonClick}
+                   disabled={selectedMachines.length === 0}
+               >
+                   <FontAwesomeIcon icon={faTrash} /> Delete
+               </button>  
+               <button className="view-machines-button" onClick={() => fetchMachines(true)}>
+                   <FontAwesomeIcon icon={faSync} /> Refresh
+               </button>  
            </div>  
            <hr className="view-machines-divider" />  
            <div className="view-machines-content">  
                <table className="view-machines-table">  
                    <thead>  
                        <tr>  
+                           <th>  
+                               <input  
+                                   type="checkbox"  
+                                   checked={selectAll}  
+                                   onChange={handleSelectAll}  
+                               />  
+                           </th>  
                            <th>ID</th>  
                            <th>IP Address</th>  
                            <th>MAC Address</th>  
@@ -100,6 +150,13 @@ function ViewMachinesPage() {
                    <tbody>  
                        {filteredMachines.map((machine, index) => (  
                            <tr key={index}>  
+                               <td>  
+                                   <input  
+                                       type="checkbox"  
+                                       checked={selectedMachines.includes(machine)}  
+                                       onChange={() => handleCheckboxChange(machine)}  
+                                   />  
+                               </td>  
                                <td>{index + 1 + (currentPage - 1) * pageSize}</td>  
                                <td>{machine ? machine.ip : ''}</td>  
                                <td>{machine ? machine.macAddress : ''}</td>  
@@ -109,23 +166,31 @@ function ViewMachinesPage() {
                    </tbody>  
                </table>  
            </div>  
-           <div className="pagination">  
-               <button  
-                   className="pagination-button"  
-                   onClick={handlePreviousPage}  
-                   disabled={currentPage === 1}  
-               >  
-                   Previous  
-               </button>  
-               <span>Page {currentPage} of {totalPages}</span>  
-               <button  
-                   className="pagination-button"  
-                   onClick={handleNextPage}  
-                   disabled={currentPage === totalPages}  
-               >  
-                   Next  
-               </button>  
-           </div>  
+           <div className="pagination">
+               <button
+                   className="pagination-arrow"
+                   onClick={handlePreviousPage}
+                   disabled={currentPage === 1}
+               >
+                   <FontAwesomeIcon icon={faChevronLeft} />
+               </button>
+               {Array.from({ length: totalPages }, (_, i) => (
+                   <button
+                       key={i + 1}
+                       className={`pagination-number ${currentPage === i + 1 ? 'active' : ''}`}
+                       onClick={() => handlePageClick(i + 1)}
+                   >
+                       {i + 1}
+                   </button>
+               ))}
+               <button
+                   className="pagination-arrow"
+                   onClick={handleNextPage}
+                   disabled={currentPage === totalPages}
+               >
+                   <FontAwesomeIcon icon={faChevronRight} />
+               </button>
+           </div>
        </div>  
    );  
 }  

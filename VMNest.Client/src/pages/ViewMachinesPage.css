@@ -22,7 +22,7 @@
 }
 
 .view-machines-button {
-    background-color: #4CAF50;
+    background-color: #007bff;
     color: white;
     border: none;
     padding: 15px 20px;
@@ -33,8 +33,29 @@
 }
 
 .view-machines-button:hover {
-    background-color: #45a049;
+    background-color:  #0056b3;
 }
+
+.view-machines-delete-button {
+    background-color: #ff4d4d; /* Red background */
+    color: white;
+    border: none;
+    padding: 15px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-right: 10px;
+}
+
+.view-machines-delete-button:hover {
+    background-color: #e60000; /* Darker red on hover */
+}
+
+.view-machines-delete-button.disabled {
+    background-color: #cccccc; /* Gray background for disabled state */
+    cursor: not-allowed;
+}
+
 
 .view-machines-divider {
     border: none;
@@ -63,8 +84,40 @@
     font-weight: bold;
 }
 
+.view-machines-table th input[type="checkbox"],
+.view-machines-table td input[type="checkbox"] {
+    transform: scale(1.2);
+    cursor: pointer;
+    background-color: #ffffff; /* Light white background */
+    border: 1px solid gray; /* Gray border */
+    border-radius: 4px; /* Adds rounded corners */
+    appearance: none; /* Removes default browser styling */
+    width: 20px;
+    height: 20px;
+    position: relative;
+}
+
+.view-machines-table th input[type="checkbox"]:checked,
+.view-machines-table td input[type="checkbox"]:checked {
+    background-color: #007bff; /* Blue background when checked */
+    border-color: #0056b3; /* Darker blue border when checked */
+}
+
+.view-machines-table th input[type="checkbox"]:checked::after,
+.view-machines-table td input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    top: 50%; /* Center vertically */
+    left: 50%; /* Center horizontally */
+    width: 6px;
+    height: 12px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: translate(-50%, -50%) rotate(45deg); /* Center and rotate */
+}
+
 .view-machines-table tr:nth-child(even) {
-    background-color: #f9f9f9;
+background-color: #f9f9f9;
 }
 
 .view-machines-table tr:hover {
@@ -73,24 +126,45 @@
 
 .pagination {
     display: flex;
-    justify-content: center; /* Centers the pagination controls horizontally */
+    justify-content: center;
     align-items: center;
-    margin-top: 20px; /* Adds space between the table and pagination */
-    position: relative;
-    bottom: -50px; /* Moves the pagination lower */
+    margin-top: 20px;
+    gap: 5px;
 }
 
-.pagination-button {
-    padding: 10px 20px;
-    margin: 0 5px; 
-    background-color: #007bff;
-    color: white;
+.pagination-arrow {
+    background-color: transparent; /* Transparent background */
+    color: #007bff; /* Blue color for arrows */
     border: none;
-    border-radius: 5px;
+    padding: 10px 15px;
     cursor: pointer;
+    font-size: 16px;
 }
 
-.pagination-button:disabled {
-    background-color: #cccccc;
+.pagination-arrow:hover {
+    color: gray; /* Change arrow color to gray on hover */
+}
+
+.pagination-arrow:disabled {
+    color: #cccccc; /* Gray color for disabled arrows */
     cursor: not-allowed;
+}
+
+.pagination-number {
+    background-color: transparent; /* Transparent background */
+    color: #007bff; /* Blue color for numbers */
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 16px;
+    text-decoration: underline; /* Underline like a link */
+}
+
+.pagination-number.active {
+    font-weight: bold; /* Bold for the active page */
+    text-decoration: none; /* Remove underline for the active page */
+}
+
+.pagination-number:hover {
+    color: #0056b3; /* Darker blue on hover */
 }
