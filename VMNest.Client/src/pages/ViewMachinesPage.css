@@ -65,23 +65,25 @@
 
 .view-machines-content {
     margin-top: 20px;
+    width: 100%; /* Ensure the content takes the full width */
 }
 
 .view-machines-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
 }
 
 .view-machines-table th, .view-machines-table td {
-    border: 1px solid #ccc;
-    padding: 10px;
-    text-align: left;
+    padding: 15px; /* Add padding for better spacing */
+    text-align: left; /* Align text to the left */
+    border: none; /* Remove column separators */
 }
 
 .view-machines-table th {
-    background-color: #f4f4f4;
     font-weight: bold;
+    background-color: #fafafa; /* Light gray background for the header */
+    border-bottom: 1px solid #ccc; /* Add a line below the header */
+    border-top: 1px solid #ccc; /* Add a line above the header */
 }
 
 .view-machines-table th input[type="checkbox"],
@@ -116,13 +118,10 @@
     transform: translate(-50%, -50%) rotate(45deg); /* Center and rotate */
 }
 
-.view-machines-table tr:nth-child(even) {
-background-color: #f9f9f9;
+.view-machines-table tr {
+border-bottom: 1px solid #ccc; /* Add horizontal lines for each row */
 }
 
-.view-machines-table tr:hover {
-    background-color: #f1f1f1;
-}
 
 .pagination {
     display: flex;

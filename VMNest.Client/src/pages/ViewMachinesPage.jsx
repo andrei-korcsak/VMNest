@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './ViewMachinesPage.css';  
 import axios from 'axios';  
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash, faSync, faSpinner, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faSync, faSpinner, faChevronLeft, faChevronRight, faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
 function ViewMachinesPage() {  
    const [machines, setMachines] = useState([]);  
    const [filteredMachines, setFilteredMachines] = useState([]);  
@@ -13,6 +13,7 @@ function ViewMachinesPage() {
    const [searchQuery, setSearchQuery] = useState('');  
    const [selectedMachines, setSelectedMachines] = useState([]);  
    const [selectAll, setSelectAll] = useState(false);  
+   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
    const pageSize = 10;  
 
     const fetchMachines = async (updateTableOnly = false) => {
@@ -95,6 +96,22 @@ function ViewMachinesPage() {
        alert(`Performing action on ${selectedMachines.length} selected machines.`);  
    };  
 
+    const handleSort = (key) => {
+        let direction = 'asc';
+        if (sortConfig.key === key && sortConfig.direction === 'asc') {
+            direction = 'desc';
+        }
+        setSortConfig({ key, direction });
+
+        const sortedMachines = [...filteredMachines].sort((a, b) => {
+            if (!a || !b) return 0; // Handle null or undefined values
+            if (a[key] < b[key]) return direction === 'asc' ? -1 : 1;
+            if (a[key] > b[key]) return direction === 'asc' ? 1 : -1;
+            return 0;
+        });
+        setFilteredMachines(sortedMachines);
+    };
+
     if (loading) {
         return (
             <div className="loading-container">
@@ -129,41 +146,67 @@ function ViewMachinesPage() {
                    <FontAwesomeIcon icon={faSync} /> Refresh
                </button>  
            </div>  
-           <hr className="view-machines-divider" />  
            <div className="view-machines-content">  
                <table className="view-machines-table">  
                    <thead>  
-                       <tr>  
-                           <th>  
-                               <input  
-                                   type="checkbox"  
-                                   checked={selectAll}  
-                                   onChange={handleSelectAll}  
-                               />  
-                           </th>  
-                           <th>ID</th>  
-                           <th>IP Address</th>  
-                           <th>MAC Address</th>  
-                           <th>DNS Name</th>  
-                       </tr>  
+                       <tr>
+                           <th>
+                               <input
+                                   type="checkbox"
+                                   checked={selectAll}
+                                   onChange={handleSelectAll}
+                               />
+                           </th>
+                           <th>
+                               ID
+                           </th>
+                           <th onClick={() => handleSort('ip')}>
+                               IP Address{' '}
+                               <FontAwesomeIcon
+                                   icon={sortConfig.key === 'ip' && sortConfig.direction === 'asc' ? faArrowUp : faArrowDown}
+                                   style={{
+                                       color: sortConfig.key === 'ip' ? 'black' : 'gray',
+                                   }}
+                               />
+                           </th>
+                           <th onClick={() => handleSort('macAddress')}>
+                               MAC Address{' '}
+                               <FontAwesomeIcon
+                                   icon={sortConfig.key === 'macAddress' && sortConfig.direction === 'asc' ? faArrowUp : faArrowDown}
+                                   style={{
+                                       color: sortConfig.key === 'macAddress' ? 'black' : 'gray',
+                                   }}
+                               />
+                           </th>
+                           <th onClick={() => handleSort('name')}>
+                               DNS Name{' '}
+                               <FontAwesomeIcon
+                                   icon={sortConfig.key === 'name' && sortConfig.direction === 'asc' ? faArrowUp : faArrowDown}
+                                   style={{
+                                       color: sortConfig.key === 'name' ? 'black' : 'gray',
+                                   }}
+                               />
+                           </th>                       </tr>
                    </thead>  
-                   <tbody>  
-                       {filteredMachines.map((machine, index) => (  
-                           <tr key={index}>  
-                               <td>  
-                                   <input  
-                                       type="checkbox"  
-                                       checked={selectedMachines.includes(machine)}  
-                                       onChange={() => handleCheckboxChange(machine)}  
-                                   />  
-                               </td>  
-                               <td>{index + 1 + (currentPage - 1) * pageSize}</td>  
-                               <td>{machine ? machine.ip : ''}</td>  
-                               <td>{machine ? machine.macAddress : ''}</td>  
-                               <td>{machine ? machine.name : ''}</td>  
-                           </tr>  
-                       ))}  
-                   </tbody>  
+                   <tbody>
+                       {filteredMachines
+                           .filter((machine) => machine && (machine.ip || machine.macAddress || machine.name)) // Exclude rows with no data
+                           .map((machine, index) => (
+                               <tr key={index}>
+                                   <td>
+                                       <input
+                                           type="checkbox"
+                                           checked={selectedMachines.includes(machine)}
+                                           onChange={() => handleCheckboxChange(machine)}
+                                       />
+                                   </td>
+                                   <td>{index + 1 + (currentPage - 1) * pageSize}</td>
+                                   <td>{machine ? machine.ip : ''}</td>
+                                   <td>{machine ? machine.macAddress : ''}</td>
+                                   <td>{machine ? machine.name : ''}</td>
+                               </tr>
+                           ))}
+                   </tbody>
                </table>  
            </div>  
            <div className="pagination">
