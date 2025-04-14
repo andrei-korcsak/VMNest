@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';  
 import './ViewMachinesPage.css';  
 import axios from 'axios';  
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash, faSync } from '@fortawesome/free-solid-svg-icons';
 function ViewMachinesPage() {  
    const [machines, setMachines] = useState([]);  
    const [filteredMachines, setFilteredMachines] = useState([]);  
@@ -107,14 +108,15 @@ function ViewMachinesPage() {
                    onChange={handleSearch}  
                    className="view-machines-search-bar"  
                />  
-               <button className="view-machines-button">Add Machine</button>  
-               <button className="view-machines-button">Remove Machine</button>  
-               <button  
-                   className="view-machines-button"  
-                   onClick={handleActionButtonClick}  
-                   disabled={selectedMachines.length === 0}  
-               >  
-                   Perform Action  
+               <button
+                   className={`view-machines-delete-button ${selectedMachines.length === 0 ? 'disabled' : ''}`}  
+                   onClick={handleActionButtonClick}
+                   disabled={selectedMachines.length === 0}
+               >
+                   <FontAwesomeIcon icon={faTrash} /> Delete
+               </button>  
+               <button className="view-machines-button">
+                   <FontAwesomeIcon icon={faSync} /> Refresh
                </button>  
            </div>  
            <hr className="view-machines-divider" />  

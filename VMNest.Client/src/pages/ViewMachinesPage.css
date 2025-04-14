@@ -22,7 +22,7 @@
 }
 
 .view-machines-button {
-    background-color: #4CAF50;
+    background-color: #007bff;
     color: white;
     border: none;
     padding: 15px 20px;
@@ -33,8 +33,29 @@
 }
 
 .view-machines-button:hover {
-    background-color: #45a049;
+    background-color:  #0056b3;
 }
+
+.view-machines-delete-button {
+    background-color: #ff4d4d; /* Red background */
+    color: white;
+    border: none;
+    padding: 15px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-right: 10px;
+}
+
+.view-machines-delete-button:hover {
+    background-color: #e60000; /* Darker red on hover */
+}
+
+.view-machines-delete-button.disabled {
+    background-color: #cccccc; /* Gray background for disabled state */
+    cursor: not-allowed;
+}
+
 
 .view-machines-divider {
     border: none;
