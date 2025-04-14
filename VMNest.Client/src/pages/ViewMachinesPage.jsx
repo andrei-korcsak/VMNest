@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './ViewMachinesPage.css';  
 import axios from 'axios';  
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash, faSync } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faSync, faSpinner } from '@fortawesome/free-solid-svg-icons';
 function ViewMachinesPage() {  
    const [machines, setMachines] = useState([]);  
    const [filteredMachines, setFilteredMachines] = useState([]);  
@@ -15,31 +15,32 @@ function ViewMachinesPage() {
    const [selectAll, setSelectAll] = useState(false);  
    const pageSize = 10;  
 
-   useEffect(() => {  
-       const fetchMachines = async () => {  
-           setLoading(true);  
-           try {  
-               const response = await axios.get(`http://localhost:5063/api/ViewMachines/ips-and-macs`, {  
-                   params: {  
-                       page: currentPage,  
-                       pageSize: pageSize,  
-                   },  
-                   headers: {  
-                       'Content-Type': 'application/json',  
-                   },  
-               });  
-               const fetchedMachines = response.data.items;  
-               const paddedMachines = Array.from({ length: pageSize }, (_, i) => fetchedMachines[i] || null);  
-               setMachines(paddedMachines);  
-               setFilteredMachines(paddedMachines);  
-               setTotalPages(response.data.totalPages);  
-           } catch (err) {  
-               setError('Failed to fetch machines data.');  
-           } finally {  
-               setLoading(false);  
-           }  
-       };  
+    const fetchMachines = async (updateTableOnly = false) => {
+        if (!updateTableOnly) setLoading(true);
+        if (updateTableOnly) setFilteredMachines([]); // Clear the table during refresh  
+        try {
+            const response = await axios.get(`http://localhost:5063/api/ViewMachines/ips-and-macs`, {
+                params: {
+                    page: currentPage,
+                    pageSize: pageSize,
+                },
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            const fetchedMachines = response.data.items;
+            const paddedMachines = Array.from({ length: pageSize }, (_, i) => fetchedMachines[i] || null);
+            setMachines(paddedMachines);
+            setFilteredMachines(paddedMachines);
+            setTotalPages(response.data.totalPages);
+        } catch (err) {
+            setError('Failed to fetch machines data.');
+        } finally {
+            if (!updateTableOnly) setLoading(false);
+        }
+    };  
 
+    useEffect(() => {  
        fetchMachines();  
    }, [currentPage]);  
 
@@ -90,9 +91,14 @@ function ViewMachinesPage() {
        alert(`Performing action on ${selectedMachines.length} selected machines.`);  
    };  
 
-   if (loading) {  
-       return <div>Loading...</div>;  
-   }  
+    if (loading) {
+        return (
+            <div className="loading-container">
+                <FontAwesomeIcon icon={faSpinner} spin size="3x" />
+                <p>Loading...</p>
+            </div>
+        );
+    }  
 
    if (error) {  
        return <div className="error">{error}</div>;  
@@ -115,7 +121,7 @@ function ViewMachinesPage() {
                >
                    <FontAwesomeIcon icon={faTrash} /> Delete
                </button>  
-               <button className="view-machines-button">
+               <button className="view-machines-button" onClick={() => fetchMachines(true)}>
                    <FontAwesomeIcon icon={faSync} /> Refresh
                </button>  
            </div>  
