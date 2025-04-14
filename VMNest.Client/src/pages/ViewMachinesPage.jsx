@@ -76,7 +76,7 @@ function ViewMachinesPage() {
                            <th>ID</th>  
                            <th>IP Address</th>  
                            <th>MAC Address</th>  
-                           <th>Type</th>  
+                           <th>DNS Name</th>
                        </tr>  
                    </thead>  
                    <tbody>  
@@ -85,7 +85,7 @@ function ViewMachinesPage() {
                                <td>{index + 1 + (currentPage - 1) * pageSize}</td>  
                                <td>{machine ? machine.ip : ''}</td>  
                                <td>{machine ? machine.macAddress : ''}</td>  
-                               <td>{machine ? machine.type : ''}</td>  
+                               <td>{machine ? machine.name : ''}</td>  
                            </tr>  
                        ))}  
                    </tbody>  
