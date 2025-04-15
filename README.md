@@ -24,7 +24,7 @@ VMNest is an application for managing virtual machines within a network. It prov
  - A login system is planned for future versions. This option will allow users to securely log off from the application.
 
 # Screenshots
-<img width="468" alt="VMNest-view-machines" src="https://github.com/user-attachments/assets/ecf52eaa-1b13-4bf2-82c3-0a954b883197" />
+<img width="1000" alt="VMNest-view-machines" src="https://github.com/user-attachments/assets/bb0eb004-338b-4e87-b42f-8a9fa1fbc3c4" />
 
 # Technologies Used
 - ASP.NET Core
