@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import './ViewMachinesPage.css';  
 import axios from 'axios';  
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash, faSync, faSpinner, faChevronLeft, faChevronRight, faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faSync, faChevronLeft, faChevronRight, faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
+import { FadeLoader } from "react-spinners";
+
 function ViewMachinesPage() {  
    const [machines, setMachines] = useState([]);  
    const [filteredMachines, setFilteredMachines] = useState([]);  
@@ -186,7 +188,7 @@ function ViewMachinesPage() {
                        {tableLoading && (
                            <tr className="table-body-overlay">
                                <td colSpan="5">
-                                   <FontAwesomeIcon icon={faSpinner} spin size="2x" />
+                                   <FadeLoader color="#007bff" size={40} />
                                    <p>Loading...</p>
                                </td>
                            </tr>

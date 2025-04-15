@@ -183,7 +183,7 @@ height: 65px; /* Set a consistent height for all rows */
     left: 0;
     width: 100%;
     height: 100%; /* Set the height to match 10 rows */
-    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+    background-color: rgba(255, 255, 255, 0.85); /* Semi-transparent white */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -199,9 +199,3 @@ height: 65px; /* Set a consistent height for all rows */
     text-align: center;
     color: #333; /* Text color */
 }
-
-/*.view-machines-table tr.empty-row td {
-    border-bottom: none;*/ /* Remove the bottom border for rows with no data */
-    /*background-color: #f9f9f9;*/ /* Optional: Light gray background for empty rows */
-    /*height: 50px;*/ /* Ensure consistent row height */
-/*}*/
