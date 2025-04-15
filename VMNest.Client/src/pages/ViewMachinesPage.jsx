@@ -19,7 +19,6 @@ function ViewMachinesPage() {
 
     const fetchMachines = async () => {
         setTableLoading(true); // Show table-specific loading
-        setFilteredMachines([]); // Clear the table during refresh
 
         try {
             const response = await axios.get(`http://localhost:5063/api/ViewMachines/ips-and-macs`, {
@@ -183,36 +182,40 @@ function ViewMachinesPage() {
                                />
                            </th>                       </tr>
                    </thead>  
-                   <tbody>
-                       {tableLoading ? (
-                           <tr>
-                               <td colSpan="5" style={{ textAlign: 'center' }}>
+                   <tbody className="table-body-container">
+                       {tableLoading && (
+                           <tr className="table-body-overlay">
+                               <td colSpan="5">
                                    <FontAwesomeIcon icon={faSpinner} spin size="2x" />
                                    <p>Loading...</p>
                                </td>
                            </tr>
-                       ) : (
-                           filteredMachines
-                               .filter((machine) => machine && (machine.ip || machine.macAddress || machine.name)) // Exclude rows with no data
-                               .map((machine, index) => (
-                                   <tr key={index}>
-                                       <td>
-                                           <input
-                                               type="checkbox"
-                                               checked={selectedMachines.includes(machine)}
-                                               onChange={() => handleCheckboxChange(machine)}
-                                           />
-                                       </td>
-                                       <td>{index + 1 + (currentPage - 1) * pageSize}</td>
-                                       <td>{machine ? machine.ip : ''}</td>
-                                       <td>{machine ? machine.macAddress : ''}</td>
-                                       <td>{machine ? machine.name : ''}</td>
-                                   </tr>
-                               ))
                        )}
+                       {Array.from({ length: pageSize }, (_, index) => {
+                           const machine = filteredMachines[index];
+                           return machine ? (
+                               <tr key={index}>
+                                   <td>
+                                       <input
+                                           type="checkbox"
+                                           checked={selectedMachines.includes(machine)}
+                                           onChange={() => handleCheckboxChange(machine)}
+                                       />
+                                   </td>
+                                   <td>{index + 1 + (currentPage - 1) * pageSize}</td>
+                                   <td>{machine.ip}</td>
+                                   <td>{machine.macAddress}</td>
+                                   <td>{machine.name}</td>
+                               </tr>
+                           ) : (
+                               <tr key={index} className="empty-row">
+                                   <td colSpan="5">&nbsp;</td> {/* Render an empty row */}
+                               </tr>
+                           );
+                       })}
                    </tbody>
-               </table>  
-           </div>  
+                </table>  
+            </div>
            <div className="pagination">
                <button
                    className="pagination-arrow"
