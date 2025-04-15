@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import './ViewMachinesPage.css';  
 import axios from 'axios';  
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash, faSync, faSpinner, faChevronLeft, faChevronRight, faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faSync, faChevronLeft, faChevronRight, faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
+import { FadeLoader } from "react-spinners";
+
 function ViewMachinesPage() {  
    const [machines, setMachines] = useState([]);  
    const [filteredMachines, setFilteredMachines] = useState([]);  
-   const [loading, setLoading] = useState(true);  
    const [error, setError] = useState(null);  
    const [currentPage, setCurrentPage] = useState(1);  
    const [totalPages, setTotalPages] = useState(1);  
@@ -14,11 +15,13 @@ function ViewMachinesPage() {
    const [selectedMachines, setSelectedMachines] = useState([]);  
    const [selectAll, setSelectAll] = useState(false);  
    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+   const [tableLoading, setTableLoading] = useState(false); // New state for table-specific loading
+
    const pageSize = 10;  
 
-    const fetchMachines = async (updateTableOnly = false) => {
-        if (!updateTableOnly) setLoading(true);
-        if (updateTableOnly) setFilteredMachines([]); // Clear the table during refresh  
+    const fetchMachines = async () => {
+        setTableLoading(true); // Show table-specific loading
+
         try {
             const response = await axios.get(`http://localhost:5063/api/ViewMachines/ips-and-macs`, {
                 params: {
@@ -34,10 +37,12 @@ function ViewMachinesPage() {
             setMachines(paddedMachines);
             setFilteredMachines(paddedMachines);
             setTotalPages(response.data.totalPages);
-        } catch (err) {
+        } catch {
             setError('Failed to fetch machines data.');
         } finally {
-            if (!updateTableOnly) setLoading(false);
+
+            setTableLoading(false); // Hide table-specific loading
+
         }
     };  
 
@@ -112,15 +117,6 @@ function ViewMachinesPage() {
         setFilteredMachines(sortedMachines);
     };
 
-    if (loading) {
-        return (
-            <div className="loading-container">
-                <FontAwesomeIcon icon={faSpinner} spin size="3x" />
-                <p>Loading...</p>
-            </div>
-        );
-    }  
-
    if (error) {  
        return <div className="error">{error}</div>;  
    }  
@@ -188,10 +184,18 @@ function ViewMachinesPage() {
                                />
                            </th>                       </tr>
                    </thead>  
-                   <tbody>
-                       {filteredMachines
-                           .filter((machine) => machine && (machine.ip || machine.macAddress || machine.name)) // Exclude rows with no data
-                           .map((machine, index) => (
+                   <tbody className="table-body-container">
+                       {tableLoading && (
+                           <tr className="table-body-overlay">
+                               <td colSpan="5">
+                                   <FadeLoader color="#007bff" size={40} />
+                                   <p>Loading...</p>
+                               </td>
+                           </tr>
+                       )}
+                       {Array.from({ length: pageSize }, (_, index) => {
+                           const machine = filteredMachines[index];
+                           return machine ? (
                                <tr key={index}>
                                    <td>
                                        <input
@@ -201,14 +205,19 @@ function ViewMachinesPage() {
                                        />
                                    </td>
                                    <td>{index + 1 + (currentPage - 1) * pageSize}</td>
-                                   <td>{machine ? machine.ip : ''}</td>
-                                   <td>{machine ? machine.macAddress : ''}</td>
-                                   <td>{machine ? machine.name : ''}</td>
+                                   <td>{machine.ip}</td>
+                                   <td>{machine.macAddress}</td>
+                                   <td>{machine.name}</td>
                                </tr>
-                           ))}
+                           ) : (
+                               <tr key={index} className="empty-row">
+                                   <td colSpan="5">&nbsp;</td> {/* Render an empty row */}
+                               </tr>
+                           );
+                       })}
                    </tbody>
-               </table>  
-           </div>  
+                </table>  
+            </div>
            <div className="pagination">
                <button
                    className="pagination-arrow"
