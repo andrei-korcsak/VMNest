@@ -7,10 +7,12 @@ namespace VMNest.Server.Controllers
     public class ViewMachinesController : Controller
     {
         private readonly IpNetTable _ipNetTable;
+        private readonly MongoDbContext _dbContext;
 
-        public ViewMachinesController()
+        public ViewMachinesController(MongoDbContext dbContext)
         {
             _ipNetTable = new IpNetTable();
+            _dbContext = dbContext;
         }
 
         [HttpGet("ips-and-macs")]
@@ -33,6 +35,9 @@ namespace VMNest.Server.Controllers
                 {
                     items[i].Name = resolvedDnsNames[i];
                 }
+
+                // Save machines to MongoDB
+                await _dbContext.Machines.InsertManyAsync(items);
 
                 return Ok(new { items, totalPages });
             }
