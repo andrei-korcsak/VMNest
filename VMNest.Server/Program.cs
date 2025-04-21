@@ -17,6 +17,9 @@ builder.Services.AddCors(options =>
         });
 });
 
+// Add MongoDB context
+builder.Services.AddSingleton<MongoDbContext>();
+
 var app = builder.Build();
 
 app.UseDefaultFiles();
