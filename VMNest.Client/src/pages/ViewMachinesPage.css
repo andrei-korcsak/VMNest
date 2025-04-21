@@ -199,3 +199,42 @@ height: 65px; /* Set a consistent height for all rows */
     text-align: center;
     color: #333; /* Text color */
 }
+
+.status-bubble {
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: white;
+    width: fit-content;
+}
+
+/* Green bubble for "Running" */
+.status-running {
+    background-color: #d4edda; /* Light green background */
+    color: #155724; /* Dark green text */
+}
+
+/* Gray bubble for "Off" */
+.status-off {
+    background-color: #e2e3e5; /* Light gray background */
+    color: #6c757d; /* Dark gray text */
+}
+
+/* Indicator circle */
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.status-running .status-indicator {
+    background-color: #28a745; /* Green circle */
+}
+
+.status-off .status-indicator {
+    background-color: #6c757d; /* Gray circle */
+}
