@@ -24,19 +24,14 @@ function ViewMachinesPage() {
 
         try {
             const response = await axios.get(`http://localhost:5063/api/ViewMachines/ips-and-macs`, {
-                params: {
-                    page: 1,
-                    pageSize: 10000,
-                },
                 headers: {
                     'Content-Type': 'application/json',
                 },
             });
             const fetchedMachines = response.data.items;
-            const paddedMachines = Array.from({ length: pageSize }, (_, i) => fetchedMachines[i] || null);
 
             // Apply default sorting by Status
-            const sortedMachines = [...paddedMachines].sort((a, b) => {
+            const sortedMachines = [...fetchedMachines].sort((a, b) => {
                 if (!a || !b) return 0;
                 if (a.status < b.status) return sortConfig.direction === 'desc' ? -1 : 1;
                 if (a.status > b.status) return sortConfig.direction === 'desc' ? 1 : -1;
@@ -44,8 +39,8 @@ function ViewMachinesPage() {
             });
 
             setMachines(sortedMachines);
-            setFilteredMachines(sortedMachines);
-            setTotalPages(response.data.totalPages);
+            setTotalPages(Math.ceil(sortedMachines.length / pageSize));
+            setFilteredMachines(sortedMachines.slice(0, pageSize)); // Set initial page
         } catch {
             setError('Failed to fetch machines data.');
         } finally {
@@ -57,7 +52,7 @@ function ViewMachinesPage() {
 
     useEffect(() => {  
        fetchMachines();  
-   }, [currentPage]);  
+   }, []);  
 
    const handleSearch = (e) => {  
        const query = e.target.value.toLowerCase();  
@@ -71,6 +66,13 @@ function ViewMachinesPage() {
        );  
        setFilteredMachines(filtered);  
    };  
+
+    useEffect(() => {
+        // Update displayed rows when currentPage changes
+        const startIndex = (currentPage - 1) * pageSize;
+        const paginatedMachines = machines.slice(startIndex, startIndex + pageSize);
+        setFilteredMachines(paginatedMachines);
+    }, [currentPage, machines]);
 
     const handlePageClick = (pageNumber) => {
         setCurrentPage(pageNumber);
@@ -106,9 +108,46 @@ function ViewMachinesPage() {
        }  
    };  
 
-   const handleActionButtonClick = () => {  
-       alert(`Performing action on ${selectedMachines.length} selected machines.`);  
-   };  
+    const handleDelete = async () => {
+        if (selectedMachines.length === 0) {
+            alert("No machines selected for deletion.");
+            return;
+        }
+
+        const selectedIds = selectedMachines.map((machine) => machine.id); // Assuming each machine has a unique 'id'
+
+        try {
+            // Send DELETE request to the API
+            await axios.delete(`http://localhost:5063/api/ViewMachines`, {
+                data: selectedIds, // Pass IDs in the request body
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            // Remove deleted machines from the state
+            const updatedMachines = machines.filter(
+                (machine) => !selectedIds.includes(machine.id)
+            );
+            setMachines(updatedMachines);
+
+            // Update filteredMachines and pagination
+            const startIndex = (currentPage - 1) * pageSize;
+            const paginatedMachines = updatedMachines.slice(startIndex, startIndex + pageSize);
+            setFilteredMachines(paginatedMachines);
+            setTotalPages(Math.ceil(updatedMachines.length / pageSize));
+
+            // Clear selection
+            setSelectedMachines([]);
+            setSelectAll(false);
+
+            alert("Selected machines deleted successfully.");
+        } catch (error) {
+            console.error("Failed to delete machines:", error);
+            alert("Failed to delete selected machines. Please try again.");
+        }
+    };
+
 
     const handleSort = (key) => {
         let direction = 'asc';
@@ -142,7 +181,7 @@ function ViewMachinesPage() {
                />  
                <button
                    className={`view-machines-delete-button ${selectedMachines.length === 0 ? 'disabled' : ''}`}  
-                   onClick={handleActionButtonClick}
+                   onClick={handleDelete}
                    disabled={selectedMachines.length === 0}
                >
                    <FontAwesomeIcon icon={faTrash} /> Delete

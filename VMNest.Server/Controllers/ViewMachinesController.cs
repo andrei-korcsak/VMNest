@@ -18,12 +18,12 @@ namespace VMNest.Server.Controllers
         }
 
         [HttpGet("ips-and-macs")]
-        public async Task<IActionResult> GetIpsAndMacs([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> GetIpsAndMacs()
         {
             try
             {
                 // Get paginated machine data
-                var (items, totalPages) = _ipNetTable.GetIpsAndMacs(page, pageSize);
+                var items = _ipNetTable.GetIpsAndMacs();
 
                 // Resolve DNS names asynchronously
                 var resolvedDnsNames = new List<string>();
@@ -75,20 +75,34 @@ namespace VMNest.Server.Controllers
                 // Read saved machines from MongoDB
                 var savedMachines = await _dbContext.Machines
                     .Find(_ => true)
-                    .Skip((page - 1) * pageSize)
-                    .Limit(pageSize)
                     .ToListAsync();
 
-                // Calculate total pages based on database count
-                var totalRecords = await _dbContext.Machines.CountDocumentsAsync(_ => true);
-                var totalPagesFromDb = (int)Math.Ceiling((double)totalRecords / pageSize);
-
-                return Ok(new { items = savedMachines, totalPages = totalPagesFromDb });
+                return Ok(new { items = savedMachines});
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteMachines([FromBody] List<string> ids)
+        {
+            try
+            {
+                // Create a filter to match the documents with the specified IDs
+                var filter = Builders<MachineModel>.Filter.In(m => m.Id, ids);
+
+                // Delete the matching documents
+                var result = await _dbContext.Machines.DeleteManyAsync(filter);
+
+                return Ok(new { DeletedCount = result.DeletedCount });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
     }
 }
