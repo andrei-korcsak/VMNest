@@ -144,7 +144,7 @@ public partial class IpNetTable
         }
     }
 
-    public (List<MachineModel> Items, int TotalPages) GetIpsAndMacs(int page, int pageSize)
+    public List<MachineModel> GetIpsAndMacs()
     {
         List<MachineModel> result = new List<MachineModel>();
 
@@ -227,7 +227,7 @@ public partial class IpNetTable
                         Ip = new IPAddress(BitConverter.GetBytes(row.dwAddr)).ToString(),
                         MacAddress = string.Join(":", mac),
                         Type = row.dwType.ToString(),
-                        Status = "Active"
+                        Status = "Running"
                     });
                 }
             }
@@ -238,15 +238,6 @@ public partial class IpNetTable
             FreeMibTable(buffer);
         }
 
-        // Pagination logic
-        int totalItems = result.Count;
-        int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
-
-        var paginatedResult = result
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToList();
-
-        return (paginatedResult, totalPages);
+        return result;
     }
 }

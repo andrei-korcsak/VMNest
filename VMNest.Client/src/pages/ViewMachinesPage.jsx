@@ -24,19 +24,14 @@ function ViewMachinesPage() {
 
         try {
             const response = await axios.get(`http://localhost:5063/api/ViewMachines/ips-and-macs`, {
-                params: {
-                    page: 1,
-                    pageSize: 10000,
-                },
                 headers: {
                     'Content-Type': 'application/json',
                 },
             });
             const fetchedMachines = response.data.items;
-            const paddedMachines = Array.from({ length: pageSize }, (_, i) => fetchedMachines[i] || null);
 
             // Apply default sorting by Status
-            const sortedMachines = [...paddedMachines].sort((a, b) => {
+            const sortedMachines = [...fetchedMachines].sort((a, b) => {
                 if (!a || !b) return 0;
                 if (a.status < b.status) return sortConfig.direction === 'desc' ? -1 : 1;
                 if (a.status > b.status) return sortConfig.direction === 'desc' ? 1 : -1;
@@ -44,8 +39,8 @@ function ViewMachinesPage() {
             });
 
             setMachines(sortedMachines);
-            setFilteredMachines(sortedMachines);
-            setTotalPages(response.data.totalPages);
+            setTotalPages(Math.ceil(sortedMachines.length / pageSize));
+            setFilteredMachines(sortedMachines.slice(0, pageSize)); // Set initial page
         } catch {
             setError('Failed to fetch machines data.');
         } finally {
@@ -57,7 +52,7 @@ function ViewMachinesPage() {
 
     useEffect(() => {  
        fetchMachines();  
-   }, [currentPage]);  
+   }, []);  
 
    const handleSearch = (e) => {  
        const query = e.target.value.toLowerCase();  
@@ -71,6 +66,13 @@ function ViewMachinesPage() {
        );  
        setFilteredMachines(filtered);  
    };  
+
+    useEffect(() => {
+        // Update displayed rows when currentPage changes
+        const startIndex = (currentPage - 1) * pageSize;
+        const paginatedMachines = machines.slice(startIndex, startIndex + pageSize);
+        setFilteredMachines(paginatedMachines);
+    }, [currentPage, machines]);
 
     const handlePageClick = (pageNumber) => {
         setCurrentPage(pageNumber);
