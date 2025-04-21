@@ -15,7 +15,7 @@ function ViewMachinesPage() {
    const [selectedMachines, setSelectedMachines] = useState([]);  
    const [selectAll, setSelectAll] = useState(false);  
    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
-   const [tableLoading, setTableLoading] = useState(false); // New state for table-specific loading
+   const [tableLoading, setTableLoading] = useState(false);
 
    const pageSize = 10;  
 
@@ -25,8 +25,8 @@ function ViewMachinesPage() {
         try {
             const response = await axios.get(`http://localhost:5063/api/ViewMachines/ips-and-macs`, {
                 params: {
-                    page: currentPage,
-                    pageSize: pageSize,
+                    page: 1,
+                    pageSize: 10000,
                 },
                 headers: {
                     'Content-Type': 'application/json',
@@ -34,8 +34,17 @@ function ViewMachinesPage() {
             });
             const fetchedMachines = response.data.items;
             const paddedMachines = Array.from({ length: pageSize }, (_, i) => fetchedMachines[i] || null);
-            setMachines(paddedMachines);
-            setFilteredMachines(paddedMachines);
+
+            // Apply default sorting by Status
+            const sortedMachines = [...paddedMachines].sort((a, b) => {
+                if (!a || !b) return 0;
+                if (a.status < b.status) return sortConfig.direction === 'desc' ? -1 : 1;
+                if (a.status > b.status) return sortConfig.direction === 'desc' ? 1 : -1;
+                return 0;
+            });
+
+            setMachines(sortedMachines);
+            setFilteredMachines(sortedMachines);
             setTotalPages(response.data.totalPages);
         } catch {
             setError('Failed to fetch machines data.');
@@ -182,7 +191,17 @@ function ViewMachinesPage() {
                                        color: sortConfig.key === 'name' ? 'black' : 'gray',
                                    }}
                                />
-                           </th>                       </tr>
+                           </th>
+                           <th onClick={() => handleSort('status')}>
+                               Status{' '}
+                               <FontAwesomeIcon
+                                   icon={sortConfig.key === 'status' && sortConfig.direction === 'asc' ? faArrowUp : faArrowDown}
+                                   style={{
+                                       color: sortConfig.key === 'status' ? 'black' : 'gray',
+                                   }}
+                               />
+                           </th>
+                       </tr>
                    </thead>  
                    <tbody className="table-body-container">
                        {tableLoading && (
@@ -208,6 +227,12 @@ function ViewMachinesPage() {
                                    <td>{machine.ip}</td>
                                    <td>{machine.macAddress}</td>
                                    <td>{machine.name}</td>
+                                   <td>
+                                       <span className={`status-bubble ${machine.status === 'Running' ? 'status-running' : 'status-off'}`}>
+                                           <span className="status-indicator"></span>
+                                           {machine.status}
+                                       </span>
+                                   </td>
                                </tr>
                            ) : (
                                <tr key={index} className="empty-row">
