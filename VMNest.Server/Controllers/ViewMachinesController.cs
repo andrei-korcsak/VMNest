@@ -84,5 +84,25 @@ namespace VMNest.Server.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteMachines([FromBody] List<string> ids)
+        {
+            try
+            {
+                // Create a filter to match the documents with the specified IDs
+                var filter = Builders<MachineModel>.Filter.In(m => m.Id, ids);
+
+                // Delete the matching documents
+                var result = await _dbContext.Machines.DeleteManyAsync(filter);
+
+                return Ok(new { DeletedCount = result.DeletedCount });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
     }
 }

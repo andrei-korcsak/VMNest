@@ -108,9 +108,46 @@ function ViewMachinesPage() {
        }  
    };  
 
-   const handleActionButtonClick = () => {  
-       alert(`Performing action on ${selectedMachines.length} selected machines.`);  
-   };  
+    const handleDelete = async () => {
+        if (selectedMachines.length === 0) {
+            alert("No machines selected for deletion.");
+            return;
+        }
+
+        const selectedIds = selectedMachines.map((machine) => machine.id); // Assuming each machine has a unique 'id'
+
+        try {
+            // Send DELETE request to the API
+            await axios.delete(`http://localhost:5063/api/ViewMachines`, {
+                data: selectedIds, // Pass IDs in the request body
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            // Remove deleted machines from the state
+            const updatedMachines = machines.filter(
+                (machine) => !selectedIds.includes(machine.id)
+            );
+            setMachines(updatedMachines);
+
+            // Update filteredMachines and pagination
+            const startIndex = (currentPage - 1) * pageSize;
+            const paginatedMachines = updatedMachines.slice(startIndex, startIndex + pageSize);
+            setFilteredMachines(paginatedMachines);
+            setTotalPages(Math.ceil(updatedMachines.length / pageSize));
+
+            // Clear selection
+            setSelectedMachines([]);
+            setSelectAll(false);
+
+            alert("Selected machines deleted successfully.");
+        } catch (error) {
+            console.error("Failed to delete machines:", error);
+            alert("Failed to delete selected machines. Please try again.");
+        }
+    };
+
 
     const handleSort = (key) => {
         let direction = 'asc';
@@ -144,7 +181,7 @@ function ViewMachinesPage() {
                />  
                <button
                    className={`view-machines-delete-button ${selectedMachines.length === 0 ? 'disabled' : ''}`}  
-                   onClick={handleActionButtonClick}
+                   onClick={handleDelete}
                    disabled={selectedMachines.length === 0}
                >
                    <FontAwesomeIcon icon={faTrash} /> Delete
