@@ -9,10 +9,10 @@ VMNest is an application for managing virtual machines within a network. It prov
 
 # Features
 ## View Machines
- - Displays all active machines within the network where the application is running.
- - Shows key details like IP addresses, MAC addresses, and DNS names in a table.
- - Includes an option to delete entries. In the future, addresses will be stored in a MongoDB database so both active and inactive machines are retained. The delete function will then remove entries from the database.
- - Features a search bar for quickly locating specific entries and a "Refresh" button to update the table.
+ - Displays all active/inactive machines within the network where the application is running.
+ - Shows key details like IP addresses, MAC addresses, DNS names, and machine status in a table.
+ - Includes an option to delete entries. Addresses are stored in a MongoDB database and both active and inactive machines are retained. The delete function removes the selected entries from the database.
+ - Features a search bar for quickly locating specific entries and a "Refresh" button to update the table and database.
 
 ## Dashboard (Not yet implemented)
  - This screen will provide a visual dashboard to track various metrics from the machines, such as memory usage, uptime, storage, etc.
@@ -24,12 +24,13 @@ VMNest is an application for managing virtual machines within a network. It prov
  - A login system is planned for future versions. This option will allow users to securely log off from the application.
 
 # Screenshots
-<img width="1917" alt="image" src="https://github.com/user-attachments/assets/b8831282-94da-4c6d-a9c2-b3adadf7e6ba" />
+<img width="1916" alt="image" src="https://github.com/user-attachments/assets/a09bd396-75eb-4a33-bc17-17fb43c5ea2c" />
 
 # Technologies Used
 - ASP.NET Core
 - C#
 - ReactJS
+- MongoDB
 - Javascript
 - HTML
 - CSS
