@@ -182,7 +182,17 @@ function ViewMachinesPage() {
                                        color: sortConfig.key === 'name' ? 'black' : 'gray',
                                    }}
                                />
-                           </th>                       </tr>
+                           </th>
+                           <th onClick={() => handleSort('status')}>
+                               Status{' '}
+                               <FontAwesomeIcon
+                                   icon={sortConfig.key === 'status' && sortConfig.direction === 'asc' ? faArrowUp : faArrowDown}
+                                   style={{
+                                       color: sortConfig.key === 'status' ? 'black' : 'gray',
+                                   }}
+                               />
+                           </th>
+                       </tr>
                    </thead>  
                    <tbody className="table-body-container">
                        {tableLoading && (
@@ -208,6 +218,7 @@ function ViewMachinesPage() {
                                    <td>{machine.ip}</td>
                                    <td>{machine.macAddress}</td>
                                    <td>{machine.name}</td>
+                                   <td>{machine.status}</td>
                                </tr>
                            ) : (
                                <tr key={index} className="empty-row">

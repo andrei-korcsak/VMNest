@@ -226,7 +226,8 @@ public partial class IpNetTable
                     {
                         Ip = new IPAddress(BitConverter.GetBytes(row.dwAddr)).ToString(),
                         MacAddress = string.Join(":", mac),
-                        Type = row.dwType.ToString()
+                        Type = row.dwType.ToString(),
+                        Status = "Active"
                     });
                 }
             }
