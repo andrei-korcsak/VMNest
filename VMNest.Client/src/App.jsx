@@ -8,7 +8,7 @@ import SettingsPage from './pages/SettingsPage';
 import './App.css';
 
 function App() {
-    const [selectedOption, setSelectedOption] = useState('Dashboard');
+    const [selectedOption, setSelectedOption] = useState('View Machines');
 
     const handleOptionSelect = (option) => {
         setSelectedOption(option);
@@ -26,7 +26,7 @@ function App() {
                         <Route path="/dashboard" element={<DashboardPage />} />
                         <Route path="/view-machines" element={<ViewMachinesPage />} />
                         <Route path="/settings" element={<SettingsPage />} />
-                        <Route path="/" element={<Navigate to="/dashboard" />} />
+                        <Route path="/" element={<Navigate to="/view-machines" />} />
                     </Routes>
                 </div>
             </div>
