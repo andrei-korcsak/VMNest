@@ -275,7 +275,7 @@ function ViewMachinesPage() {
                                </tr>
                            ) : (
                                <tr key={index} className="empty-row">
-                                   <td colSpan="5">&nbsp;</td> {/* Render an empty row */}
+                                   <td colSpan="5">&nbsp;</td>
                                </tr>
                            );
                        })}
