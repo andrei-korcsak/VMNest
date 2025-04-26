@@ -23,7 +23,7 @@ function ViewMachinesPage() {
         setTableLoading(true); // Show table-specific loading
 
         try {
-            const response = await axios.get(`http://alevel23.asuscomm.com:5063/api/ViewMachines/ips-and-macs`, {
+            const response = await axios.get(`http://localhost:5063/api/ViewMachines/ips-and-macs`, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
