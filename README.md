@@ -42,4 +42,5 @@ Open the command line at the preferred location to clone the repository by execu
 Once the repository has been succesfully cloned, open the VMNest.sln in Visual Studio
 
 Install the Node.js dependency in the root folder by running `npm install`
+
 Navigate to VMNest.Client and run the command `npm run dev`
