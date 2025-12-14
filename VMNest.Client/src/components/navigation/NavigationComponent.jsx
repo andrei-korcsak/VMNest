@@ -11,7 +11,7 @@ function NavigationComponent({ onOptionSelect }) {
     const navigate = useNavigate();
 
     const options = [
-        { label: 'View Machines', icon: ViewMachinesIcon, path: '/view-machines' },
+        { label: 'View Machines Test', icon: ViewMachinesIcon, path: '/view-machines' },
         { label: 'Dashboard', icon: DashboardIcon, path: '/dashboard' },
         { label: 'Settings', icon: SettingsIcon, path: '/settings' },
         { label: 'Sign Out', icon: SignOutIcon, path: null },
