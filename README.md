@@ -39,4 +39,7 @@ VMNest is an application for managing virtual machines within a network. It prov
 Open the command line at the preferred location to clone the repository by executing the command below:
 - git clone https://github.com/andrei-korcsak/VMNest.git
 
-Once the repository has been succesfully cloned, open the VMNest.sln in Visual Studio and run the application.
+Once the repository has been succesfully cloned, open the VMNest.sln in Visual Studio
+
+Install the Node.js dependency in the root folder by running: npm install
+Navigate to VMNest.Client and run the command: npm run dev
