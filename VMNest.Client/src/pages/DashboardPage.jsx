@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './DashboardPage.css';
+import axios from 'axios';
 
 function DashboardPage() {
     const [stats, setStats] = useState(null);
@@ -14,16 +15,25 @@ function DashboardPage() {
 
     const fetchDashboardData = async () => {
         try {
+            setLoading(true);
+
             const [statsResponse, metricsResponse] = await Promise.all([
-                fetch('/api/dashboard/stats'),
-                fetch('/api/dashboard/machines-metrics')
+                axios.get(`http://localhost:5063/api/dashboard/stats`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    timeout: 60000,
+                }),
+                axios.get(`http://localhost:5063/api/dashboard/machines-metrics`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    timeout: 60000,
+                })
             ]);
 
-            const statsData = await statsResponse.json();
-            const metricsData = await metricsResponse.json();
-
-            setStats(statsData);
-            setMachinesMetrics(metricsData);
+            setStats(statsResponse.data);
+            setMachinesMetrics(metricsResponse.data);
             setLoading(false);
         } catch (error) {
             console.error('Error fetching dashboard data:', error);
