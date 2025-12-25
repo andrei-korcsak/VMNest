@@ -14,4 +14,37 @@ public class MachineModel
     public string? Status { get; set; }
     public string? Type { get; set; }
     public bool IsEnabled { get; set; }
+    public MachineMetrics? Metrics { get; set; }
+    public DateTime? LastUpdated { get; set; }
+}
+
+public class MachineMetrics
+{
+    public double CpuUsagePercent { get; set; }
+    public MemoryInfo? Memory { get; set; }
+    public List<DiskInfo>? Disks { get; set; }
+    public NetworkInfo? Network { get; set; }
+    public TimeSpan? Uptime { get; set; }
+    public int ProcessCount { get; set; }
+}
+
+public class MemoryInfo
+{
+    public long TotalBytes { get; set; }
+    public long UsedBytes { get; set; }
+    public double UsagePercent => TotalBytes > 0 ? (UsedBytes * 100.0) / TotalBytes : 0;
+}
+
+public class DiskInfo
+{
+    public string? DriveName { get; set; }
+    public long TotalBytes { get; set; }
+    public long UsedBytes { get; set; }
+    public double UsagePercent => TotalBytes > 0 ? (UsedBytes * 100.0) / TotalBytes : 0;
+}
+
+public class NetworkInfo
+{
+    public long BytesSent { get; set; }
+    public long BytesReceived { get; set; }
 }
