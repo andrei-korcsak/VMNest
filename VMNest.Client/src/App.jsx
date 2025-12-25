@@ -5,6 +5,7 @@ import HeaderComponent from './components/header/HeaderComponent';
 import ViewMachinesPage from './pages/ViewMachinesPage';
 import DashboardPage from './pages/DashboardPage';
 import SettingsPage from './pages/SettingsPage';
+import { MachinesProvider } from './contexts/MachinesContext';
 import './App.css';
 
 function App() {
@@ -16,20 +17,21 @@ function App() {
 
     return (
         <Router>
+            <MachinesProvider>
+                <div className="app">
+                    <NavigationComponent onOptionSelect={handleOptionSelect} />
+                    <HeaderComponent title={selectedOption} />
 
-            <div className="app">
-                <NavigationComponent onOptionSelect={handleOptionSelect} />
-                <HeaderComponent title={selectedOption} />
-
-                <div className="main-content">
-                    <Routes>
-                        <Route path="/dashboard" element={<DashboardPage />} />
-                        <Route path="/view-machines" element={<ViewMachinesPage />} />
-                        <Route path="/settings" element={<SettingsPage />} />
-                        <Route path="/" element={<Navigate to="/view-machines" />} />
-                    </Routes>
+                    <div className="main-content">
+                        <Routes>
+                            <Route path="/dashboard" element={<DashboardPage />} />
+                            <Route path="/view-machines" element={<ViewMachinesPage />} />
+                            <Route path="/settings" element={<SettingsPage />} />
+                            <Route path="/" element={<Navigate to="/view-machines" />} />
+                        </Routes>
+                    </div>
                 </div>
-            </div>
+            </MachinesProvider>
         </Router>
     );
 }

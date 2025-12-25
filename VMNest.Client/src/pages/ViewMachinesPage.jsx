@@ -1,79 +1,84 @@
 import React, { useEffect, useState } from 'react';  
 import './ViewMachinesPage.css';  
-import axios from 'axios';  
+import { useMachines } from '../contexts/MachinesContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faSync, faChevronLeft, faChevronRight, faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
 import { FadeLoader } from "react-spinners";
 
 function ViewMachinesPage() {  
-   const [machines, setMachines] = useState([]);  
+   const { machines: contextMachines, loading: contextLoading, error: contextError, fetchMachines, deleteMachines } = useMachines();
    const [filteredMachines, setFilteredMachines] = useState([]);  
-   const [error, setError] = useState(null);  
    const [currentPage, setCurrentPage] = useState(1);  
    const [totalPages, setTotalPages] = useState(1);  
    const [searchQuery, setSearchQuery] = useState('');  
    const [selectedMachines, setSelectedMachines] = useState([]);  
    const [selectAll, setSelectAll] = useState(false);  
-   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+   const [sortConfig, setSortConfig] = useState({ key: 'status', direction: 'asc' });
    const [tableLoading, setTableLoading] = useState(false);
 
    const pageSize = 10;  
 
-    const fetchMachines = async () => {
-        setTableLoading(true); // Show table-specific loading
+    // Fetch machines only on initial mount if not already loaded
+    useEffect(() => {  
+       const loadMachines = async () => {
+           setTableLoading(true);
+           try {
+               await fetchMachines(false); // false = don't force refresh if data exists
+           } catch (error) {
+               console.error('Error loading machines:', error);
+           } finally {
+               setTableLoading(false);
+           }
+       };
+       
+       loadMachines();
+   }, [fetchMachines]);
 
-        try {
-            const response = await axios.get(`http://localhost:5063/api/ViewMachines/ips-and-macs`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                timeout: 60000,
-            });
-            const fetchedMachines = response.data.items;
-
+    // Update filtered machines when context machines change
+    useEffect(() => {
+        if (contextMachines.length > 0) {
             // Apply default sorting by Status
-            const sortedMachines = [...fetchedMachines].sort((a, b) => {
+            const sortedMachines = [...contextMachines].sort((a, b) => {
                 if (!a || !b) return 0;
                 if (a.status < b.status) return sortConfig.direction === 'desc' ? -1 : 1;
                 if (a.status > b.status) return sortConfig.direction === 'desc' ? 1 : -1;
                 return 0;
             });
 
-            setMachines(sortedMachines);
             setTotalPages(Math.ceil(sortedMachines.length / pageSize));
-            setFilteredMachines(sortedMachines.slice(0, pageSize)); // Set initial page
-        } catch {
-            setError('Failed to fetch machines data.');
-        } finally {
-
-            setTableLoading(false); // Hide table-specific loading
-
+            
+            // Apply pagination
+            const startIndex = (currentPage - 1) * pageSize;
+            setFilteredMachines(sortedMachines.slice(startIndex, startIndex + pageSize));
         }
-    };  
+    }, [contextMachines, currentPage, sortConfig, pageSize]);
 
-    useEffect(() => {  
-       fetchMachines();  
-   }, []);  
+    const handleRefresh = async () => {
+        setTableLoading(true);
+        try {
+            await fetchMachines(true); // true = force refresh
+            setCurrentPage(1); // Reset to first page
+        } catch (error) {
+            console.error('Error refreshing machines:', error);
+        } finally {
+            setTableLoading(false);
+        }
+    };
 
    const handleSearch = (e) => {  
        const query = e.target.value.toLowerCase();  
        setSearchQuery(query);  
-       const filtered = machines.filter((machine) =>  
+       const filtered = contextMachines.filter((machine) =>  
            machine && (  
                machine.ip.toLowerCase().includes(query) ||  
                machine.macAddress.toLowerCase().includes(query) ||  
                machine.name.toLowerCase().includes(query)  
            )  
-       );  
-       setFilteredMachines(filtered);  
+       );
+       setTotalPages(Math.ceil(filtered.length / pageSize));
+       setFilteredMachines(filtered.slice(0, pageSize));
+       setCurrentPage(1); // Reset to first page on search
    };  
-
-    useEffect(() => {
-        // Update displayed rows when currentPage changes
-        const startIndex = (currentPage - 1) * pageSize;
-        const paginatedMachines = machines.slice(startIndex, startIndex + pageSize);
-        setFilteredMachines(paginatedMachines);
-    }, [currentPage, machines]);
 
     const handlePageClick = (pageNumber) => {
         setCurrentPage(pageNumber);
@@ -115,28 +120,20 @@ function ViewMachinesPage() {
             return;
         }
 
-        const selectedIds = selectedMachines.map((machine) => machine.id); // Assuming each machine has a unique 'id'
+        const selectedIds = selectedMachines.map((machine) => machine.id);
 
         try {
             // Send DELETE request to the API
+            const axios = (await import('axios')).default;
             await axios.delete(`http://localhost:5063/api/ViewMachines`, {
-                data: selectedIds, // Pass IDs in the request body
+                data: selectedIds,
                 headers: {
                     'Content-Type': 'application/json',
                 },
             });
 
-            // Remove deleted machines from the state
-            const updatedMachines = machines.filter(
-                (machine) => !selectedIds.includes(machine.id)
-            );
-            setMachines(updatedMachines);
-
-            // Update filteredMachines and pagination
-            const startIndex = (currentPage - 1) * pageSize;
-            const paginatedMachines = updatedMachines.slice(startIndex, startIndex + pageSize);
-            setFilteredMachines(paginatedMachines);
-            setTotalPages(Math.ceil(updatedMachines.length / pageSize));
+            // Update context with deleted machines
+            deleteMachines(selectedIds);
 
             // Clear selection
             setSelectedMachines([]);
@@ -149,7 +146,6 @@ function ViewMachinesPage() {
         }
     };
 
-
     const handleSort = (key) => {
         let direction = 'asc';
         if (sortConfig.key === key && sortConfig.direction === 'asc') {
@@ -158,7 +154,7 @@ function ViewMachinesPage() {
         setSortConfig({ key, direction });
 
         const sortedMachines = [...filteredMachines].sort((a, b) => {
-            if (!a || !b) return 0; // Handle null or undefined values
+            if (!a || !b) return 0;
             if (a[key] < b[key]) return direction === 'asc' ? -1 : 1;
             if (a[key] > b[key]) return direction === 'asc' ? 1 : -1;
             return 0;
@@ -166,8 +162,8 @@ function ViewMachinesPage() {
         setFilteredMachines(sortedMachines);
     };
 
-   if (error) {  
-       return <div className="error">{error}</div>;  
+   if (contextError) {  
+       return <div className="error">{contextError}</div>;  
    }  
 
    return (  
@@ -187,7 +183,7 @@ function ViewMachinesPage() {
                >
                    <FontAwesomeIcon icon={faTrash} /> Delete
                </button>  
-               <button className="view-machines-button" onClick={() => fetchMachines(true)}>
+               <button className="view-machines-button" onClick={handleRefresh}>
                    <FontAwesomeIcon icon={faSync} /> Refresh
                </button>  
            </div>  
@@ -244,9 +240,9 @@ function ViewMachinesPage() {
                        </tr>
                    </thead>  
                    <tbody className="table-body-container">
-                       {tableLoading && (
+                       {(tableLoading || contextLoading) && (
                            <tr className="table-body-overlay">
-                               <td colSpan="5">
+                               <td colSpan="6">
                                    <FadeLoader color="#007bff" size={40} />
                                    <p>Loading...</p>
                                </td>
@@ -276,7 +272,7 @@ function ViewMachinesPage() {
                                </tr>
                            ) : (
                                <tr key={index} className="empty-row">
-                                   <td colSpan="5">&nbsp;</td>
+                                   <td colSpan="6">&nbsp;</td>
                                </tr>
                            );
                        })}
