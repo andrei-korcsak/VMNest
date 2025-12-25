@@ -34,7 +34,7 @@
 }
 
 .navigation-option {  
-   width: calc(100% - 40px); /* Adjust width to match the padding of the parent container */  
+   width: calc(100% - 40px);
    padding: 15px 20px;  
    text-align: center;  
    cursor: pointer;  
@@ -47,6 +47,20 @@
 
 .navigation-option:hover {
     background-color: whitesmoke;
+}
+
+.navigation-option.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    color: #999;
+}
+
+.navigation-option.disabled:hover {
+    background-color: transparent;
+}
+
+.navigation-option.disabled .navigation-icon {
+    opacity: 0.4;
 }
 
 .navigation-icon {

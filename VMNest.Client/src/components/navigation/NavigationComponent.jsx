@@ -11,13 +11,17 @@ function NavigationComponent({ onOptionSelect }) {
     const navigate = useNavigate();
 
     const options = [
-        { label: 'View Machines', icon: ViewMachinesIcon, path: '/view-machines' },
-        { label: 'Dashboard', icon: DashboardIcon, path: '/dashboard' },
-        { label: 'Settings', icon: SettingsIcon, path: '/settings' },
-        { label: 'Sign Out', icon: SignOutIcon, path: null },
+        { label: 'View Machines', icon: ViewMachinesIcon, path: '/view-machines', disabled: false },
+        { label: 'Dashboard', icon: DashboardIcon, path: '/dashboard', disabled: false },
+        { label: 'Settings', icon: SettingsIcon, path: '/settings', disabled: false },
+        { label: 'Sign Out', icon: SignOutIcon, path: null, disabled: true },
     ];
 
     const handleNavigation = (option) => {
+        if (option.disabled) {
+            return; // Prevent navigation if disabled
+        }
+        
         if (option.path) {
             navigate(option.path); // Navigate to the specified path
         }
@@ -37,7 +41,7 @@ function NavigationComponent({ onOptionSelect }) {
                 {options.map(option => (
                     <div
                         key={option.label}
-                        className="navigation-option"
+                        className={`navigation-option ${option.disabled ? 'disabled' : ''}`}
                         onClick={() => handleNavigation(option)}
                     >
                         <img src={option.icon} alt={`${option.label} Icon`} className="navigation-icon" />
