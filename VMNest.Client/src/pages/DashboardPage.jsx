@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './DashboardPage.css';
 import axios from 'axios';
+import { API_ENDPOINTS, API_CONFIG } from '../config/api';
 
 function DashboardPage() {
     const [stats, setStats] = useState(null);
@@ -18,18 +19,8 @@ function DashboardPage() {
             setLoading(true);
 
             const [statsResponse, metricsResponse] = await Promise.all([
-                axios.get(`http://localhost:5063/api/dashboard/stats`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    timeout: 60000,
-                }),
-                axios.get(`http://localhost:5063/api/dashboard/machines-metrics`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    timeout: 60000,
-                })
+                axios.get(API_ENDPOINTS.dashboard.stats, API_CONFIG),
+                axios.get(API_ENDPOINTS.dashboard.machinesMetrics, API_CONFIG)
             ]);
 
             setStats(statsResponse.data);

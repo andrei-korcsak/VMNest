@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useCallback } from 'react';
-import axios from 'axios';
+import apiClient from '../services/apiClient';
 
 const MachinesContext = createContext();
 
@@ -27,12 +27,7 @@ export const MachinesProvider = ({ children }) => {
         setError(null);
 
         try {
-            const response = await axios.get(`http://localhost:5063/api/ViewMachines/ips-and-macs`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                timeout: 60000,
-            });
+            const response = await apiClient.get('/api/ViewMachines/ips-and-macs');
             const fetchedMachines = response.data.items;
 
             setMachines(fetchedMachines);

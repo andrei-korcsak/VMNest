@@ -4,6 +4,8 @@ import { useMachines } from '../contexts/MachinesContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faSync, faChevronLeft, faChevronRight, faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
 import { FadeLoader } from "react-spinners";
+import axios from 'axios';
+import { API_ENDPOINTS, API_CONFIG } from '../config/api';
 
 function ViewMachinesPage() {  
    const { machines: contextMachines, loading: contextLoading, error: contextError, fetchMachines, deleteMachines } = useMachines();
@@ -124,12 +126,9 @@ function ViewMachinesPage() {
 
         try {
             // Send DELETE request to the API
-            const axios = (await import('axios')).default;
-            await axios.delete(`http://localhost:5063/api/ViewMachines`, {
+            await axios.delete(API_ENDPOINTS.deleteMachines, {
                 data: selectedIds,
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                ...API_CONFIG
             });
 
             // Update context with deleted machines
