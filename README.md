@@ -43,4 +43,4 @@ Once the repository has been succesfully cloned, open the VMNest.sln in Visual S
 
 Install the Node.js dependency in the root folder by running `npm install`
 
-Navigate to VMNest.Client and run the command `npm run dev`
+Navigate to VMNest.Server and run the command `dotnet run`, this will start both the backend server and Client application.s
