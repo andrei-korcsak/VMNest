@@ -1,6 +1,8 @@
 using System.Net.Http.Json;
 using System.Diagnostics;
 using System.Management;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
 
 namespace VMNest.Agent;
 
@@ -82,9 +84,13 @@ public class Worker : BackgroundService
 
             var uptime = TimeSpan.FromMilliseconds(Environment.TickCount64);
 
+            // Get local IP address
+            var ipAddress = GetLocalIPAddress();
+
             return new MachineMetrics
             {
                 MachineId = machineId,
+                IpAddress = ipAddress,
                 Timestamp = DateTimeOffset.UtcNow,
                 CpuUsagePercentage = Math.Round(cpuUsage, 2),
                 RamUsagePercentage = Math.Round(ramUsage, 2),
@@ -98,6 +104,37 @@ public class Worker : BackgroundService
         });
     }
 
+    private string GetLocalIPAddress()
+    {
+        try
+        {
+            // Get all network interfaces
+            var networkInterfaces = NetworkInterface.GetAllNetworkInterfaces()
+                .Where(ni => ni.OperationalStatus == OperationalStatus.Up &&
+                            ni.NetworkInterfaceType != NetworkInterfaceType.Loopback)
+                .OrderByDescending(ni => ni.Speed); // Prefer faster adapters
+
+            foreach (var ni in networkInterfaces)
+            {
+                var ipProperties = ni.GetIPProperties();
+                var ipv4Address = ipProperties.UnicastAddresses
+                    .FirstOrDefault(addr => addr.Address.AddressFamily == AddressFamily.InterNetwork &&
+                                          !System.Net.IPAddress.IsLoopback(addr.Address));
+
+                if (ipv4Address != null)
+                {
+                    return ipv4Address.Address.ToString();
+                }
+            }
+
+            return "Unknown";
+        }
+        catch (Exception ex)
+        {
+            return "Unknown";
+        }
+    }
+
     private async Task SendMetricsAsync(string serverUrl, MachineMetrics metrics, CancellationToken cancellationToken)
     {
         var response = await _httpClient.PostAsJsonAsync($"{serverUrl}/api/metrics", metrics, cancellationToken);
@@ -108,6 +145,7 @@ public class Worker : BackgroundService
 public class MachineMetrics
 {
     public string MachineId { get; set; } = string.Empty;
+    public string IpAddress { get; set; } = string.Empty;
     public DateTimeOffset Timestamp { get; set; }
     public double CpuUsagePercentage { get; set; }
     public double RamUsagePercentage { get; set; }
@@ -116,7 +154,7 @@ public class MachineMetrics
     public List<DiskMetrics> DiskMetrics { get; set; } = new();
     public long NetworkSent { get; set; }
     public long NetworkReceived { get; set; }
-    public string Uptime { get; set; } = string.Empty; // Changed to string
+    public string Uptime { get; set; } = string.Empty;
 }
 
 public class DiskMetrics

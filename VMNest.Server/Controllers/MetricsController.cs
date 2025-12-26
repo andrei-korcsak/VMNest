@@ -47,7 +47,8 @@ namespace VMNest.Server.Controllers
         [HttpPost]
         public async Task<IActionResult> ReceiveMetrics([FromBody] MachineMetricsDto metrics)
         {
-            _logger.LogInformation("Received metrics from machine: {MachineId}", metrics.MachineId);
+            _logger.LogInformation("Received metrics from machine: {MachineId} ({IpAddress})", 
+                metrics.MachineId, metrics.IpAddress);
 
             await _metricsService.StoreMetricsAsync(metrics);
 
@@ -84,6 +85,7 @@ namespace VMNest.Server.Controllers
     public class MachineMetricsDto
     {
         public string MachineId { get; set; } = string.Empty;
+        public string IpAddress { get; set; } = string.Empty;
         public DateTimeOffset Timestamp { get; set; }
         public double CpuUsagePercentage { get; set; }
         public double RamUsagePercentage { get; set; }
@@ -92,7 +94,7 @@ namespace VMNest.Server.Controllers
         public List<DiskMetricsDto> DiskMetrics { get; set; } = new();
         public long NetworkSent { get; set; }
         public long NetworkReceived { get; set; }
-        public string Uptime { get; set; } = string.Empty; // Changed to string
+        public string Uptime { get; set; } = string.Empty;
     }
 
     public class DiskMetricsDto

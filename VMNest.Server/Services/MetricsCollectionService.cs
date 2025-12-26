@@ -40,7 +40,7 @@ public class MetricsCollectionService
             };
 
             // Update the machine with new metrics
-            var filter = Builders<MachineModel>.Filter.Eq(m => m.Name, metricsDto.MachineId);
+            var filter = Builders<MachineModel>.Filter.Eq(m => m.Ip, metricsDto.IpAddress);
             var update = Builders<MachineModel>.Update
                 .Set(m => m.Metrics, metrics)
                 .Set(m => m.LastUpdated, DateTime.UtcNow);
