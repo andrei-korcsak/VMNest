@@ -42,8 +42,7 @@ public class MetricsCollectionService
             // Update the machine with new metrics
             var filter = Builders<MachineModel>.Filter.Eq(m => m.Ip, metricsDto.IpAddress);
             var update = Builders<MachineModel>.Update
-                .Set(m => m.Metrics, metrics)
-                .Set(m => m.LastUpdated, DateTime.UtcNow);
+                .Set(m => m.Metrics, metrics);
 
             var result = await _dbContext.Machines.UpdateOneAsync(filter, update);
 
@@ -67,7 +66,7 @@ public class MetricsCollectionService
         if (machine?.Metrics == null)
             return null;
 
-        return ConvertToDto(machineId, machine.Metrics, machine.LastUpdated ?? DateTime.UtcNow);
+        return ConvertToDto(machineId, machine.Metrics, DateTime.UtcNow);
     }
 
     public async Task<IEnumerable<MachineMetricsDto>> GetMetricsHistoryAsync(string machineId, int hours)

@@ -40,8 +40,7 @@ namespace VMNest.Server.Controllers
                         ? machinesWithMetrics.Where(m => m.Metrics?.Memory != null).Average(m => m.Metrics!.Memory!.UsagePercent)
                         : 0,
                     HighCpuMachines = machinesWithMetrics.Count(m => m.Metrics!.CpuUsagePercent > 80),
-                    HighMemoryMachines = machinesWithMetrics.Count(m => m.Metrics?.Memory != null && m.Metrics.Memory.UsagePercent > 80),
-                    LastUpdated = DateTime.UtcNow
+                    HighMemoryMachines = machinesWithMetrics.Count(m => m.Metrics?.Memory != null && m.Metrics.Memory.UsagePercent > 80)
                 };
 
                 return Ok(stats);
@@ -72,8 +71,7 @@ namespace VMNest.Server.Controllers
                     MemoryUsedMB = m.Metrics?.Memory != null ? m.Metrics.Memory.UsedBytes / (1024.0 * 1024.0) : 0,
                     MemoryTotalMB = m.Metrics?.Memory != null ? m.Metrics.Memory.TotalBytes / (1024.0 * 1024.0) : 0,
                     ProcessCount = m.Metrics?.ProcessCount ?? 0,
-                    Uptime = m.Metrics?.Uptime?.ToString(@"d\.hh\:mm\:ss"),
-                    m.LastUpdated
+                    Uptime = m.Metrics?.Uptime?.ToString(@"d\.hh\:mm\:ss")
                 }).ToList();
 
                 return Ok(metricsData);

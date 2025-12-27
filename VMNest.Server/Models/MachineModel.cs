@@ -15,7 +15,6 @@ public class MachineModel
     public string? Type { get; set; }
     public bool IsEnabled { get; set; }
     public MachineMetrics? Metrics { get; set; }
-    public DateTime? LastUpdated { get; set; }
 }
 
 public class MachineMetrics

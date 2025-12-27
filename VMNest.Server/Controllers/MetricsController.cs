@@ -26,8 +26,7 @@ namespace VMNest.Server.Controllers
             {
                 var filter = Builders<MachineModel>.Filter.Eq(m => m.Ip, request.IpAddress);
                 var update = Builders<MachineModel>.Update
-                    .Set(m => m.Metrics, request.Metrics)
-                    .Set(m => m.LastUpdated, DateTime.UtcNow);
+                    .Set(m => m.Metrics, request.Metrics);
 
                 var result = await _dbContext.Machines.UpdateOneAsync(filter, update);
 
