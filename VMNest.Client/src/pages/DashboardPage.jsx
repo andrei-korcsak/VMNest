@@ -54,6 +54,13 @@ function DashboardPage() {
         return `${mbps.toFixed(2)} Mbps`;
     };
 
+    const formatBytes = (mb) => {
+        if (mb >= 1024) {
+            return `${(mb / 1024).toFixed(1)} GB`;
+        }
+        return `${mb.toFixed(0)} MB`;
+    };
+
     if (loading) {
         return <div className="dashboard-loading">Loading dashboard...</div>;
     }
@@ -92,40 +99,83 @@ function DashboardPage() {
                 <div className="metrics-grid">
                     {machinesMetrics.map(machine => (
                         <div key={machine.id} className="machine-metric-card">
-                            <h4>{machine.name || machine.ip}</h4>
-                            <div className="metric-row">
-                                <span>CPU Usage:</span>
-                                <div className="progress-bar">
-                                    <div
-                                        className="progress-fill cpu"
-                                        style={{ width: `${machine.cpuUsage}%` }}
-                                    >
-                                        {machine.cpuUsage.toFixed(1)}%
+                            <div className="card-header">
+                                <h4 className="machine-name">{machine.name || machine.ip}</h4>
+                                <span className="update-time">{formatLastUpdated(machine.lastUpdated)}</span>
+                            </div>
+
+                            <div className="card-body">
+                                {/* System Resources Section */}
+                                <div className="metrics-section">
+                                    <h5 className="section-title">System Resources</h5>
+                                    
+                                    <div className="metric-row">
+                                        <span className="metric-label">CPU Usage</span>
+                                        <div className="progress-bar">
+                                            <div
+                                                className="progress-fill cpu"
+                                                style={{ width: `${machine.cpuUsage}%` }}
+                                            >
+                                                {machine.cpuUsage.toFixed(1)}%
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="metric-row">
+                                        <span className="metric-label">Memory Usage</span>
+                                        <div className="progress-bar">
+                                            <div
+                                                className="progress-fill memory"
+                                                style={{ width: `${machine.memoryUsage}%` }}
+                                            >
+                                                {machine.memoryUsage.toFixed(1)}%
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="metric-detail">
+                                        <span className="detail-label">Memory:</span>
+                                        <span className="detail-value">
+                                            {formatBytes(machine.memoryUsedMB)} / {formatBytes(machine.memoryTotalMB)}
+                                        </span>
                                     </div>
                                 </div>
-                            </div>
-                            <div className="metric-row">
-                                <span>Memory Usage:</span>
-                                <div className="progress-bar">
-                                    <div
-                                        className="progress-fill memory"
-                                        style={{ width: `${machine.memoryUsage}%` }}
-                                    >
-                                        {machine.memoryUsage.toFixed(1)}%
+
+                                {/* Network Section */}
+                                <div className="metrics-section">
+                                    <h5 className="section-title">Network</h5>
+                                    <div className="metric-detail">
+                                        <span className="detail-label">Adapter:</span>
+                                        <span className="detail-value">{machine.ethernetAdapter || 'N/A'}</span>
+                                    </div>
+                                    <div className="network-speeds">
+                                        <div className="speed-item download">
+                                            <span className="speed-icon">↓</span>
+                                            <span className="speed-label">Download</span>
+                                            <span className="speed-value">{formatBandwidth(machine.downloadSpeedMbps || 0)}</span>
+                                        </div>
+                                        <div className="speed-item upload">
+                                            <span className="speed-icon">↑</span>
+                                            <span className="speed-label">Upload</span>
+                                            <span className="speed-value">{formatBandwidth(machine.uploadSpeedMbps || 0)}</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div className="metric-info">
-                                <p>Memory: {machine.memoryUsedMB?.toFixed(0)} MB / {machine.memoryTotalMB?.toFixed(0)} MB</p>
-                                <p>Processes: {machine.processCount}</p>
-                                <p>Uptime: {machine.uptime}</p>
-                                <p>Adapter: {machine.ethernetAdapter}</p>
-                                <p className="network-speed">
-                                    <span className="download">↓ {formatBandwidth(machine.downloadSpeedMbps || 0)}</span>
-                                    {' '}
-                                    <span className="upload">↑ {formatBandwidth(machine.uploadSpeedMbps || 0)}</span>
-                                </p>
-                                <p className="last-updated">Last Updated: {formatLastUpdated(machine.lastUpdated)}</p>
+
+                                {/* System Info Section */}
+                                <div className="metrics-section">
+                                    <h5 className="section-title">System Info</h5>
+                                    <div className="info-grid">
+                                        <div className="info-item">
+                                            <span className="info-label">Processes</span>
+                                            <span className="info-value">{machine.processCount || 0}</span>
+                                        </div>
+                                        <div className="info-item">
+                                            <span className="info-label">Uptime</span>
+                                            <span className="info-value">{machine.uptime || 'N/A'}</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     ))}
