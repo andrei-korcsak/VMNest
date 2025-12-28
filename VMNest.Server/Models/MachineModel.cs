@@ -15,6 +15,8 @@ public class MachineModel
     public string? Type { get; set; }
     public bool IsEnabled { get; set; }
     public MachineMetrics? Metrics { get; set; }
+    public DateTime? LastUpdated { get; set; }
+    public NetworkHistory? PreviousNetwork { get; set; } 
 }
 
 public class MachineMetrics
@@ -25,6 +27,7 @@ public class MachineMetrics
     public NetworkInfo? Network { get; set; }
     public TimeSpan? Uptime { get; set; }
     public int ProcessCount { get; set; }
+    public string? EthernetAdapter { get; set; }
 }
 
 public class MemoryInfo
@@ -46,4 +49,13 @@ public class NetworkInfo
 {
     public long BytesSent { get; set; }
     public long BytesReceived { get; set; }
+    public double DownloadSpeedMbps { get; set; } 
+    public double UploadSpeedMbps { get; set; }   
+}
+
+public class NetworkHistory  
+{
+    public long BytesSent { get; set; }
+    public long BytesReceived { get; set; }
+    public DateTime Timestamp { get; set; }
 }

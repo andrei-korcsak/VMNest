@@ -33,8 +33,8 @@ namespace VMNest.Server.Controllers
                     TotalMachines = allMachines.Count,
                     RunningMachines = runningMachines.Count,
                     OffMachines = offMachines.Count,
-                    AverageCpuUsage = machinesWithMetrics.Any() 
-                        ? machinesWithMetrics.Average(m => m.Metrics!.CpuUsagePercent) 
+                    AverageCpuUsage = machinesWithMetrics.Any()
+                        ? machinesWithMetrics.Average(m => m.Metrics!.CpuUsagePercent)
                         : 0,
                     AverageMemoryUsage = machinesWithMetrics.Any() && machinesWithMetrics.Any(m => m.Metrics?.Memory != null)
                         ? machinesWithMetrics.Where(m => m.Metrics?.Memory != null).Average(m => m.Metrics!.Memory!.UsagePercent)
@@ -71,7 +71,11 @@ namespace VMNest.Server.Controllers
                     MemoryUsedMB = m.Metrics?.Memory != null ? m.Metrics.Memory.UsedBytes / (1024.0 * 1024.0) : 0,
                     MemoryTotalMB = m.Metrics?.Memory != null ? m.Metrics.Memory.TotalBytes / (1024.0 * 1024.0) : 0,
                     ProcessCount = m.Metrics?.ProcessCount ?? 0,
-                    Uptime = m.Metrics?.Uptime?.ToString(@"d\.hh\:mm\:ss")
+                    Uptime = m.Metrics?.Uptime?.ToString(@"d\.hh\:mm\:ss"),
+                    m.LastUpdated,
+                    m.Metrics?.EthernetAdapter,
+                    DownloadSpeedMbps = m.Metrics?.Network?.DownloadSpeedMbps ?? 0,
+                    UploadSpeedMbps = m.Metrics?.Network?.UploadSpeedMbps ?? 0    
                 }).ToList();
 
                 return Ok(metricsData);

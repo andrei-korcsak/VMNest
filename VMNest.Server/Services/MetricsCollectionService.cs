@@ -21,6 +21,35 @@ public class MetricsCollectionService
     {
         try
         {
+            // Get current machine to access previous network data
+            var filter = Builders<MachineModel>.Filter.Eq(m => m.Ip, metricsDto.IpAddress);
+            var currentMachine = await _dbContext.Machines.Find(filter).FirstOrDefaultAsync();
+
+            // Calculate bandwidth if we have previous data
+            double downloadSpeedMbps = 0;
+            double uploadSpeedMbps = 0;
+
+            if (currentMachine?.PreviousNetwork != null)
+            {
+                var timeDiff = (DateTime.UtcNow - currentMachine.PreviousNetwork.Timestamp).TotalSeconds;
+
+                if (timeDiff > 0)
+                {
+                    // Calculate bytes transferred since last reading
+                    long bytesReceivedDiff = metricsDto.NetworkReceived - currentMachine.PreviousNetwork.BytesReceived;
+                    long bytesSentDiff = metricsDto.NetworkSent - currentMachine.PreviousNetwork.BytesSent;
+
+                    // Convert to Mbps (Megabits per second)
+                    // bytes -> bits (*8) -> megabits (/1,000,000) -> per second (/timeDiff)
+                    downloadSpeedMbps = Math.Round((bytesReceivedDiff * 8.0) / (1_000_000 * timeDiff), 2);
+                    uploadSpeedMbps = Math.Round((bytesSentDiff * 8.0) / (1_000_000 * timeDiff), 2);
+
+                    // Handle potential counter resets (system reboot)
+                    if (downloadSpeedMbps < 0) downloadSpeedMbps = 0;
+                    if (uploadSpeedMbps < 0) uploadSpeedMbps = 0;
+                }
+            }
+
             // Convert DTO to domain model
             var metrics = new MachineMetrics
             {
@@ -36,13 +65,31 @@ public class MetricsCollectionService
                     TotalBytes = d.TotalSpace,
                     UsedBytes = d.TotalSpace - d.FreeSpace
                 }).ToList(),
-                Uptime = TimeSpan.TryParse(metricsDto.Uptime, out var uptime) ? uptime : TimeSpan.Zero
+                Network = new NetworkInfo
+                {
+                    BytesSent = metricsDto.NetworkSent,
+                    BytesReceived = metricsDto.NetworkReceived,
+                    DownloadSpeedMbps = downloadSpeedMbps,
+                    UploadSpeedMbps = uploadSpeedMbps
+                },
+                Uptime = TimeSpan.TryParse(metricsDto.Uptime, out var uptime) ? uptime : TimeSpan.Zero,
+                ProcessCount = metricsDto.ProcessCount,
+                EthernetAdapter = metricsDto.EthernetAdapter
             };
 
-            // Update the machine with new metrics
-            var filter = Builders<MachineModel>.Filter.Eq(m => m.Ip, metricsDto.IpAddress);
+            // Store current values as previous for next calculation
+            var networkHistory = new NetworkHistory
+            {
+                BytesSent = metricsDto.NetworkSent,
+                BytesReceived = metricsDto.NetworkReceived,
+                Timestamp = DateTime.UtcNow
+            };
+
+            // Update the machine with new metrics, LastUpdated timestamp, and network history
             var update = Builders<MachineModel>.Update
-                .Set(m => m.Metrics, metrics);
+                .Set(m => m.Metrics, metrics)
+                .Set(m => m.LastUpdated, DateTime.UtcNow)
+                .Set(m => m.PreviousNetwork, networkHistory);
 
             var result = await _dbContext.Machines.UpdateOneAsync(filter, update);
 
@@ -66,7 +113,7 @@ public class MetricsCollectionService
         if (machine?.Metrics == null)
             return null;
 
-        return ConvertToDto(machineId, machine.Metrics, DateTime.UtcNow);
+        return ConvertToDto(machineId, machine.Metrics, machine.LastUpdated ?? DateTime.UtcNow);
     }
 
     public async Task<IEnumerable<MachineMetricsDto>> GetMetricsHistoryAsync(string machineId, int hours)
@@ -95,7 +142,8 @@ public class MetricsCollectionService
                 FreeSpace = d.TotalBytes - d.UsedBytes,
                 UsagePercentage = (double)d.UsedBytes / d.TotalBytes * 100
             }).ToList(),
-            Uptime = uptime.ToString(@"d\.hh\:mm\:ss")
+            Uptime = uptime.ToString(@"d\.hh\:mm\:ss"),
+            ProcessCount = metrics.ProcessCount
         };
     }
 
@@ -140,14 +188,14 @@ public class MetricsCollectionService
                 };
             }
         }
-        
+
         return new MemoryInfo();
     }
 
     private List<DiskInfo> GetDiskInfo()
     {
         var disks = new List<DiskInfo>();
-        
+
         foreach (var drive in DriveInfo.GetDrives().Where(d => d.IsReady && d.DriveType == DriveType.Fixed))
         {
             disks.Add(new DiskInfo
@@ -157,7 +205,7 @@ public class MetricsCollectionService
                 UsedBytes = drive.TotalSize - drive.AvailableFreeSpace
             });
         }
-        
+
         return disks;
     }
 

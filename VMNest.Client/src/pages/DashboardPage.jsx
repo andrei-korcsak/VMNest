@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import './DashboardPage.css';
 import axios from 'axios';
 import { API_ENDPOINTS, API_CONFIG } from '../config/api';
@@ -30,6 +30,28 @@ function DashboardPage() {
             console.error('Error fetching dashboard data:', error);
             setLoading(false);
         }
+    };
+
+    const formatLastUpdated = (lastUpdated) => {
+        if (!lastUpdated) return 'Never';
+        const date = new Date(lastUpdated);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffSecs = Math.floor(diffMs / 1000);
+        
+        if (diffSecs < 60) return `${diffSecs}s ago`;
+        const diffMins = Math.floor(diffSecs / 60);
+        if (diffMins < 60) return `${diffMins}m ago`;
+        const diffHours = Math.floor(diffMins / 60);
+        if (diffHours < 24) return `${diffHours}h ago`;
+        return date.toLocaleString();
+    };
+
+    const formatBandwidth = (mbps) => {
+        if (mbps < 1) {
+            return `${(mbps * 1000).toFixed(0)} Kbps`;
+        }
+        return `${mbps.toFixed(2)} Mbps`;
     };
 
     if (loading) {
@@ -96,7 +118,14 @@ function DashboardPage() {
                             <div className="metric-info">
                                 <p>Memory: {machine.memoryUsedMB?.toFixed(0)} MB / {machine.memoryTotalMB?.toFixed(0)} MB</p>
                                 <p>Processes: {machine.processCount}</p>
-                                {machine.uptime && <p>Uptime: {machine.uptime}</p>}
+                                <p>Uptime: {machine.uptime}</p>
+                                <p>Adapter: {machine.ethernetAdapter}</p>
+                                <p className="network-speed">
+                                    <span className="download">↓ {formatBandwidth(machine.downloadSpeedMbps || 0)}</span>
+                                    {' '}
+                                    <span className="upload">↑ {formatBandwidth(machine.uploadSpeedMbps || 0)}</span>
+                                </p>
+                                <p className="last-updated">Last Updated: {formatLastUpdated(machine.lastUpdated)}</p>
                             </div>
                         </div>
                     ))}

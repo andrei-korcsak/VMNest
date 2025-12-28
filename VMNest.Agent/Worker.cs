@@ -84,27 +84,32 @@ public class Worker : BackgroundService
 
             var uptime = TimeSpan.FromMilliseconds(Environment.TickCount64);
 
-            // Get local IP address
-            var ipAddress = GetLocalIPAddress();
+            // Get network info including bytes sent/received
+            var (ipAddress, ethernetAdapter, bytesSent, bytesReceived) = GetNetworkInfo();
+
+            // Get process count
+            var processCount = Process.GetProcesses().Length;
 
             return new MachineMetrics
             {
                 MachineId = machineId,
                 IpAddress = ipAddress,
+                EthernetAdapter = ethernetAdapter,
                 Timestamp = DateTimeOffset.UtcNow,
                 CpuUsagePercentage = Math.Round(cpuUsage, 2),
                 RamUsagePercentage = Math.Round(ramUsage, 2),
                 TotalRamMB = totalRam,
                 AvailableRamMB = (long)availableRam,
                 DiskMetrics = drives,
-                NetworkSent = 0, // TODO: Implement network metrics
-                NetworkReceived = 0,
-                Uptime = uptime.ToString(@"d\.hh\:mm\:ss") // Format as string
+                NetworkSent = bytesSent,
+                NetworkReceived = bytesReceived,
+                Uptime = uptime.ToString(@"d\.hh\:mm\:ss"),
+                ProcessCount = processCount
             };
         });
     }
 
-    private string GetLocalIPAddress()
+    private (string ipAddress, string ethernetAdapter, long bytesSent, long bytesReceived) GetNetworkInfo()
     {
         try
         {
@@ -123,15 +128,22 @@ public class Worker : BackgroundService
 
                 if (ipv4Address != null)
                 {
-                    return ipv4Address.Address.ToString();
+                    // Get network statistics
+                    var stats = ni.GetIPv4Statistics();
+                    return (
+                        ipv4Address.Address.ToString(), 
+                        ni.Name,
+                        stats.BytesSent,
+                        stats.BytesReceived
+                    );
                 }
             }
 
-            return "Unknown";
+            return ("Unknown", "Unknown", 0, 0);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            return "Unknown";
+            return ("Unknown", "Unknown", 0, 0);
         }
     }
 
@@ -146,6 +158,7 @@ public class MachineMetrics
 {
     public string MachineId { get; set; } = string.Empty;
     public string IpAddress { get; set; } = string.Empty;
+    public string EthernetAdapter { get; set; } = string.Empty;
     public DateTimeOffset Timestamp { get; set; }
     public double CpuUsagePercentage { get; set; }
     public double RamUsagePercentage { get; set; }
@@ -155,6 +168,7 @@ public class MachineMetrics
     public long NetworkSent { get; set; }
     public long NetworkReceived { get; set; }
     public string Uptime { get; set; } = string.Empty;
+    public int ProcessCount { get; set; }
 }
 
 public class DiskMetrics

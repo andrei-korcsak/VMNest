@@ -85,6 +85,7 @@ namespace VMNest.Server.Controllers
     {
         public string MachineId { get; set; } = string.Empty;
         public string IpAddress { get; set; } = string.Empty;
+        public string EthernetAdapter { get; set; } = string.Empty;
         public DateTimeOffset Timestamp { get; set; }
         public double CpuUsagePercentage { get; set; }
         public double RamUsagePercentage { get; set; }
@@ -94,6 +95,7 @@ namespace VMNest.Server.Controllers
         public long NetworkSent { get; set; }
         public long NetworkReceived { get; set; }
         public string Uptime { get; set; } = string.Empty;
+        public int ProcessCount { get; set; }
     }
 
     public class DiskMetricsDto
