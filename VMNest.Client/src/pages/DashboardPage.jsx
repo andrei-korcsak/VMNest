@@ -33,18 +33,18 @@ function DashboardPage() {
     };
 
     const formatLastUpdated = (lastUpdated) => {
-        if (!lastUpdated) return 'Never';
+        if (!lastUpdated) return 'Metrics Not Obtained';
         const date = new Date(lastUpdated);
-        const now = new Date();
-        const diffMs = now - date;
-        const diffSecs = Math.floor(diffMs / 1000);
         
-        if (diffSecs < 60) return `${diffSecs}s ago`;
-        const diffMins = Math.floor(diffSecs / 60);
-        if (diffMins < 60) return `${diffMins}m ago`;
-        const diffHours = Math.floor(diffMins / 60);
-        if (diffHours < 24) return `${diffHours}h ago`;
-        return date.toLocaleString();
+        // Format: YYYY-MM-DD HH:MM:SS
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+        
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     };
 
     const formatBandwidth = (mbps) => {
@@ -111,25 +111,21 @@ function DashboardPage() {
                                     
                                     <div className="metric-row">
                                         <span className="metric-label">CPU Usage</span>
-                                        <div className="progress-bar">
+                                        <div className="progress-bar" data-percentage={`${machine.cpuUsage.toFixed(1)}%`}>
                                             <div
                                                 className="progress-fill cpu"
                                                 style={{ width: `${machine.cpuUsage}%` }}
-                                            >
-                                                {machine.cpuUsage.toFixed(1)}%
-                                            </div>
+                                            ></div>
                                         </div>
                                     </div>
 
                                     <div className="metric-row">
                                         <span className="metric-label">Memory Usage</span>
-                                        <div className="progress-bar">
+                                        <div className="progress-bar" data-percentage={`${machine.memoryUsage.toFixed(1)}%`}>
                                             <div
                                                 className="progress-fill memory"
                                                 style={{ width: `${machine.memoryUsage}%` }}
-                                            >
-                                                {machine.memoryUsage.toFixed(1)}%
-                                            </div>
+                                            ></div>
                                         </div>
                                     </div>
 
