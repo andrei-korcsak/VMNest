@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './ViewMachinesPage.css';  
 import { useMachines } from '../contexts/MachinesContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash, faSync, faChevronLeft, faChevronRight, faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faSync, faChevronLeft, faChevronRight, faArrowUp, faArrowDown, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { FadeLoader } from "react-spinners";
 import axios from 'axios';
 import { API_ENDPOINTS, API_CONFIG } from '../config/api';
@@ -20,12 +20,11 @@ function ViewMachinesPage() {
 
    const pageSize = 10;  
 
-    // Fetch machines only on initial mount if not already loaded
     useEffect(() => {  
        const loadMachines = async () => {
            setTableLoading(true);
            try {
-               await fetchMachines(false); // false = don't force refresh if data exists
+               await fetchMachines(false);
            } catch (error) {
                console.error('Error loading machines:', error);
            } finally {
@@ -36,10 +35,8 @@ function ViewMachinesPage() {
        loadMachines();
    }, [fetchMachines]);
 
-    // Update filtered machines when context machines change
     useEffect(() => {
         if (contextMachines.length > 0) {
-            // Apply default sorting by Status
             const sortedMachines = [...contextMachines].sort((a, b) => {
                 if (!a || !b) return 0;
                 if (a.status < b.status) return sortConfig.direction === 'desc' ? -1 : 1;
@@ -49,7 +46,6 @@ function ViewMachinesPage() {
 
             setTotalPages(Math.ceil(sortedMachines.length / pageSize));
             
-            // Apply pagination
             const startIndex = (currentPage - 1) * pageSize;
             setFilteredMachines(sortedMachines.slice(startIndex, startIndex + pageSize));
         }
@@ -58,8 +54,8 @@ function ViewMachinesPage() {
     const handleRefresh = async () => {
         setTableLoading(true);
         try {
-            await fetchMachines(true); // true = force refresh
-            setCurrentPage(1); // Reset to first page
+            await fetchMachines(true);
+            setCurrentPage(1);
         } catch (error) {
             console.error('Error refreshing machines:', error);
         } finally {
@@ -79,7 +75,7 @@ function ViewMachinesPage() {
        );
        setTotalPages(Math.ceil(filtered.length / pageSize));
        setFilteredMachines(filtered.slice(0, pageSize));
-       setCurrentPage(1); // Reset to first page on search
+       setCurrentPage(1);
    };  
 
     const handlePageClick = (pageNumber) => {
@@ -122,19 +118,19 @@ function ViewMachinesPage() {
             return;
         }
 
+        if (!window.confirm(`Are you sure you want to delete ${selectedMachines.length} machine(s)?`)) {
+            return;
+        }
+
         const selectedIds = selectedMachines.map((machine) => machine.id);
 
         try {
-            // Send DELETE request to the API
             await axios.delete(API_ENDPOINTS.deleteMachines, {
                 data: selectedIds,
                 ...API_CONFIG
             });
 
-            // Update context with deleted machines
             deleteMachines(selectedIds);
-
-            // Clear selection
             setSelectedMachines([]);
             setSelectAll(false);
 
@@ -162,78 +158,88 @@ function ViewMachinesPage() {
     };
 
    if (contextError) {  
-       return <div className="error">{contextError}</div>;  
+       return <div className="error-message">{contextError}</div>;  
    }  
 
    return (  
-       <div className="view-machines-page">  
-           <div className="view-machines-top-section">  
-               <input  
-                   type="text"  
-                   placeholder="Search by IP, MAC, or DNS Name"  
-                   value={searchQuery}  
-                   onChange={handleSearch}  
-                   className="view-machines-search-bar"  
-               />  
-               <button
-                   className={`view-machines-delete-button ${selectedMachines.length === 0 ? 'disabled' : ''}`}  
-                   onClick={handleDelete}
-                   disabled={selectedMachines.length === 0}
-               >
-                   <FontAwesomeIcon icon={faTrash} /> Delete
-               </button>  
-               <button className="view-machines-button" onClick={handleRefresh}>
-                   <FontAwesomeIcon icon={faSync} /> Refresh
-               </button>  
-           </div>  
-           <div className="view-machines-content">  
+       <div className="view-machines-container">
+           <div className="view-machines-toolbar">  
+               <div className="search-container">
+                   <FontAwesomeIcon icon={faSearch} className="search-icon" />
+                   <input  
+                       type="text"  
+                       placeholder="Search by IP, MAC, or DNS Name"  
+                       value={searchQuery}  
+                       onChange={handleSearch}  
+                       className="view-machines-search-bar"  
+                   />
+               </div>
+               <div className="toolbar-actions">
+                   <button className="toolbar-button refresh-button" onClick={handleRefresh}>
+                       <FontAwesomeIcon icon={faSync} /> Refresh
+                   </button>
+                   <button
+                       className={`toolbar-button delete-button ${selectedMachines.length === 0 ? 'disabled' : ''}`}  
+                       onClick={handleDelete}
+                       disabled={selectedMachines.length === 0}
+                   >
+                       <FontAwesomeIcon icon={faTrash} /> Delete ({selectedMachines.length})
+                   </button>
+               </div>
+               <div className="machines-summary">
+                   <span className="summary-item">
+                       <span className="summary-label">Total:</span>
+                       <span className="summary-value">{contextMachines.length}</span>
+                   </span>
+                   <span className="summary-item running">
+                       <span className="summary-label">Running:</span>
+                       <span className="summary-value">{contextMachines.filter(m => m.status === 'Running').length}</span>
+                   </span>
+                   <span className="summary-item offline">
+                       <span className="summary-label">Offline:</span>
+                       <span className="summary-value">{contextMachines.filter(m => m.status === 'Off').length}</span>
+                   </span>
+               </div>
+           </div>
+
+           <div className="machines-table-card">  
                <table className="view-machines-table">  
                    <thead>  
                        <tr>
-                           <th>
+                           <th className="checkbox-column">
                                <input
                                    type="checkbox"
                                    checked={selectAll}
                                    onChange={handleSelectAll}
                                />
                            </th>
-                           <th>
-                               ID
-                           </th>
-                           <th onClick={() => handleSort('ip')}>
-                               IP Address{' '}
+                           <th className="id-column">#</th>
+                           <th className="sortable" onClick={() => handleSort('ip')}>
+                               IP Address
                                <FontAwesomeIcon
                                    icon={sortConfig.key === 'ip' && sortConfig.direction === 'asc' ? faArrowUp : faArrowDown}
-                                   style={{
-                                       color: sortConfig.key === 'ip' ? 'black' : 'gray',
-                                   }}
+                                   className={`sort-icon ${sortConfig.key === 'ip' ? 'active' : ''}`}
                                />
                            </th>
-                           <th onClick={() => handleSort('macAddress')}>
-                               MAC Address{' '}
+                           <th className="sortable" onClick={() => handleSort('macAddress')}>
+                               MAC Address
                                <FontAwesomeIcon
                                    icon={sortConfig.key === 'macAddress' && sortConfig.direction === 'asc' ? faArrowUp : faArrowDown}
-                                   style={{
-                                       color: sortConfig.key === 'macAddress' ? 'black' : 'gray',
-                                   }}
+                                   className={`sort-icon ${sortConfig.key === 'macAddress' ? 'active' : ''}`}
                                />
                            </th>
-                           <th onClick={() => handleSort('name')}>
-                               DNS Name{' '}
+                           <th className="sortable" onClick={() => handleSort('name')}>
+                               DNS Name
                                <FontAwesomeIcon
                                    icon={sortConfig.key === 'name' && sortConfig.direction === 'asc' ? faArrowUp : faArrowDown}
-                                   style={{
-                                       color: sortConfig.key === 'name' ? 'black' : 'gray',
-                                   }}
+                                   className={`sort-icon ${sortConfig.key === 'name' ? 'active' : ''}`}
                                />
                            </th>
-                           <th onClick={() => handleSort('status')}>
-                               Status{' '}
+                           <th className="sortable status-column" onClick={() => handleSort('status')}>
+                               Status
                                <FontAwesomeIcon
                                    icon={sortConfig.key === 'status' && sortConfig.direction === 'asc' ? faArrowUp : faArrowDown}
-                                   style={{
-                                       color: sortConfig.key === 'status' ? 'black' : 'gray',
-                                   }}
+                                   className={`sort-icon ${sortConfig.key === 'status' ? 'active' : ''}`}
                                />
                            </th>
                        </tr>
@@ -242,29 +248,31 @@ function ViewMachinesPage() {
                        {(tableLoading || contextLoading) && (
                            <tr className="table-body-overlay">
                                <td colSpan="6">
-                                   <FadeLoader color="#007bff" size={40} />
-                                   <p>Loading...</p>
+                                   <div className="loading-overlay-content">
+                                       <FadeLoader color="#4facfe" size={40} />
+                                       <p>Loading machines...</p>
+                                   </div>
                                </td>
                            </tr>
                        )}
                        {Array.from({ length: pageSize }, (_, index) => {
                            const machine = filteredMachines[index];
                            return machine ? (
-                               <tr key={index}>
-                                   <td>
+                               <tr key={index} className="data-row">
+                                   <td className="checkbox-column">
                                        <input
                                            type="checkbox"
                                            checked={selectedMachines.includes(machine)}
                                            onChange={() => handleCheckboxChange(machine)}
                                        />
                                    </td>
-                                   <td>{index + 1 + (currentPage - 1) * pageSize}</td>
-                                   <td>{machine.ip}</td>
-                                   <td>{machine.macAddress}</td>
-                                   <td>{machine.name}</td>
-                                   <td>
-                                       <span className={`status-bubble ${machine.status === 'Running' ? 'status-running' : 'status-off'}`}>
-                                           <span className="status-indicator"></span>
+                                   <td className="id-column">{index + 1 + (currentPage - 1) * pageSize}</td>
+                                   <td className="ip-cell">{machine.ip}</td>
+                                   <td className="mac-cell">{machine.macAddress}</td>
+                                   <td className="name-cell">{machine.name || '-'}</td>
+                                   <td className="status-cell">
+                                       <span className={`status-badge ${machine.status === 'Running' ? 'status-running' : 'status-off'}`}>
+                                           <span className="status-dot"></span>
                                            {machine.status}
                                        </span>
                                    </td>
@@ -278,9 +286,10 @@ function ViewMachinesPage() {
                    </tbody>
                 </table>  
             </div>
+
            <div className="pagination">
                <button
-                   className="pagination-arrow"
+                   className="pagination-button pagination-arrow"
                    onClick={handlePreviousPage}
                    disabled={currentPage === 1}
                >
@@ -289,14 +298,14 @@ function ViewMachinesPage() {
                {Array.from({ length: totalPages }, (_, i) => (
                    <button
                        key={i + 1}
-                       className={`pagination-number ${currentPage === i + 1 ? 'active' : ''}`}
+                       className={`pagination-button pagination-number ${currentPage === i + 1 ? 'active' : ''}`}
                        onClick={() => handlePageClick(i + 1)}
                    >
                        {i + 1}
                    </button>
                ))}
                <button
-                   className="pagination-arrow"
+                   className="pagination-button pagination-arrow"
                    onClick={handleNextPage}
                    disabled={currentPage === totalPages}
                >
