@@ -83,7 +83,7 @@
 }
 
 .card-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, rgba(39, 121, 73, 1) 0%, rgba(26, 86, 154, 1) 100%);
     padding: 16px 20px;
     color: white;
     display: flex;
