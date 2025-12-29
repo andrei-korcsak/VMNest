@@ -39,8 +39,21 @@ VMNest is an application for managing virtual machines within a network. It prov
 Open the command line at the preferred location to clone the repository by executing the command below:
 - git clone https://github.com/andrei-korcsak/VMNest.git
 
-Once the repository has been succesfully cloned, open the VMNest.sln in Visual Studio
+Once the repository has been successfully cloned, open the VMNest.sln in Visual Studio
 
 Install the Node.js dependency in the root folder by running `npm install`
 
-Navigate to VMNest.Server and run the command `dotnet run`, this will start both the backend server and Client application.s
+Navigate to VMNest.Server and run the command `dotnet run`, this will start both the backend server and Client application. Or select VMNEst.Server as the startup project and run it from Visual Studio.
+
+# Running the Agent on Machines
+To collect data from machines in the network, an agent needs to be run on each machine.
+
+Navigate to the VMNest.Agent folder and run the following command to publish the agent:
+`cd C:\Users\Andrei\source\repos\VMNest\VMNest.Agent
+dotnet publish -c Release -r win-x64 --self-contained -o C:\VMNestAgent`
+
+This will create a self-contained executable in the specified output folder (C:\VMNestAgent in this case). Copy the contents of this folder to each machine in the network where you want to collect data.
+
+To ensure that the agent runs even while the user is not logged in, set up a Windows Task Scheduler task to run the agent executable at startup. Setting it up as a service is also an option, but using Task Scheduler is simpler for most users.
+
+VMNest Agent will start collecting data and sending it to the server once it is running on the machines. VMNest application will then be able to display the collected data on the "Dashboard" screen.
