@@ -14,17 +14,32 @@ VMNest is an application for managing virtual machines within a network. It prov
  - Includes an option to delete entries. Addresses are stored in a MongoDB database and both active and inactive machines are retained. The delete function removes the selected entries from the database.
  - Features a search bar for quickly locating specific entries and a "Refresh" button to update the table and database.
 
-## Dashboard (Not yet implemented)
- - This screen will provide a visual dashboard to track various metrics from the machines, such as memory usage, uptime, storage, etc.
+<img width="1918" height="955" alt="{85695A6E-25B1-4196-B3BD-83D9259323C2}" src="https://github.com/user-attachments/assets/8cbe6b57-4a64-479a-97c0-90d0e846e5d8" />
 
-## Settings (Not yet implemented)
- - This section will allow users to manage application settings.
+## Dashboard
+ - This screen will provide a visual dashboard to track various metrics from the machines, such as memory usage, uptime, memory, CPU usage, Network data such as download speed and upload speed, and number of processes currently running
+ - It provides the number of machines, number of machines running, machines that are off, and displays their averages for the machines which metrics are collected. Only machines that are currently running will be displayed on the dashboard.
+ - The "Metrics Not Obtained" message indicates that even though the machine is running, the Agent was not deployed on the machine to collect the metrics from the machine
 
-## Log Off (Not yet implemented)
- - A login system is planned for future versions. This option will allow users to securely log off from the application.
+<img width="1920" height="952" alt="{3512871A-8C8E-4A42-8164-51E841AA817B}" src="https://github.com/user-attachments/assets/cd75b26b-392e-4e36-b664-db331ba7f8b8" />
 
-# Screenshots
-<img width="1916" alt="image" src="https://github.com/user-attachments/assets/a09bd396-75eb-4a33-bc17-17fb43c5ea2c" />
+## Settings (Coming soon)
+ - This section will enable users to configure application settings.
+ - Auto-refresh Interval: Determines the frequency at which dashboards refresh.
+ - Default Landing Page: Allows users to choose the page that will appear by default when they open the application.
+ - Items Per Page: Lets users specify the number of entries displayed on each page of the "View Machines" table.
+ - Agent Polling Interval: Sets the frequency at which machine metrics are gathered and sent to the API for VMNest to display on the dashboard.
+
+Note: While the UI for the settings section is already designed, the functionality is still under development.
+
+<img width="1919" height="952" alt="{059C490C-A855-44B1-8528-E8CEE09E8AEA}" src="https://github.com/user-attachments/assets/f10a9cac-d82b-45b9-9544-be843db545db" />
+
+## Log Off (Coming soon)
+ - A login system is planned for future versions. Once implemented, this option will allow users to securely log off from the application.
+
+## Agent
+ - The Agent is a separate component within the solution that is deployed on Virtual Machines. It runs in the background, collecting metrics from the machine.
+ - These metrics are periodically sent to the API, from which the VMNest application retrieves the data for display.
 
 # Technologies Used
 - ASP.NET Core
@@ -49,8 +64,10 @@ Navigate to VMNest.Server and run the command `dotnet run`, this will start both
 To collect data from machines in the network, an agent needs to be run on each machine.
 
 Navigate to the VMNest.Agent folder and run the following command to publish the agent:
-`cd C:\Users\Andrei\source\repos\VMNest\VMNest.Agent
-dotnet publish -c Release -r win-x64 --self-contained -o C:\VMNestAgent`
+
+`cd C:\Users\Andrei\source\repos\VMNest\VMNest.Agent`
+
+`dotnet publish -c Release -r win-x64 --self-contained -o C:\VMNestAgent`
 
 This will create a self-contained executable in the specified output folder (C:\VMNestAgent in this case). Copy the contents of this folder to each machine in the network where you want to collect data.
 
