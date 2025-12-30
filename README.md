@@ -21,7 +21,7 @@ VMNest is an application for managing virtual machines within a network. It prov
  - It provides the number of machines, number of machines running, machines that are off, and displays their averages for the machines which metrics are collected. Only machines that are currently running will be displayed on the dashboard.
  - The "Metrics Not Obtained" message indicates that even though the machine is running, the Agent was not deployed on the machine to collect the metrics from the machine
 
-<img width="1920" height="952" alt="{3512871A-8C8E-4A42-8164-51E841AA817B}" src="https://github.com/user-attachments/assets/cd75b26b-392e-4e36-b664-db331ba7f8b8" />
+<img width="1919" height="954" alt="{721063CD-CFF8-4B6D-9282-951FAACC2006}" src="https://github.com/user-attachments/assets/72322636-a36f-4653-adf4-22dfac5cb7de" />
 
 ## Settings (Coming soon)
  - This section will enable users to configure application settings.
