@@ -34,7 +34,8 @@ public class Worker : BackgroundService
             {
                 var metrics = await CollectMetricsAsync(machineId);
                 await SendMetricsAsync(serverUrl, metrics, stoppingToken);
-                
+                _logger.LogInformation("Metrics RAM: {Metrics}", metrics.RamUsagePercentage);
+                _logger.LogInformation("Metrics Process Count: {Process}", metrics.ProcessCount);
                 _logger.LogInformation("Metrics sent successfully at: {Time}", DateTimeOffset.Now);
             }
             catch (Exception ex)

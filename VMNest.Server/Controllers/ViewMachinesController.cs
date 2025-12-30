@@ -22,8 +22,8 @@ namespace VMNest.Server.Controllers
         {
             try
             {
-                // Get paginated machine data
-                var items = _ipNetTable.GetIpsAndMacs();
+                // Get verified machine data (only reachable IPs)
+                var items = await _ipNetTable.GetIpsAndMacsAsync();
 
                 // Resolve DNS names asynchronously
                 var resolvedDnsNames = new List<string>();
