@@ -74,3 +74,6 @@ This will create a self-contained executable in the specified output folder (C:\
 To ensure that the agent runs even while the user is not logged in, set up a Windows Task Scheduler task to run the agent executable at startup. Setting it up as a service is also an option, but using Task Scheduler is simpler for most users.
 
 VMNest Agent will start collecting data and sending it to the server once it is running on the machines. VMNest application will then be able to display the collected data on the "Dashboard" screen.
+
+# Connection String Configuration
+The user will need to setup the connection string to their MongoDB database in the appsettings.json file located in the VMNest.Server project folder. The connection string is place in the secrets folder for development purposes.
