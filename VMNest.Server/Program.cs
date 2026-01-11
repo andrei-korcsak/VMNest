@@ -1,4 +1,5 @@
 using VMNest.Server.Services;
+using VMNest.Server.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,9 @@ builder.Services.AddSingleton<MongoDbContext>();
 
 // Register MetricsCollectionService
 builder.Services.AddScoped<MetricsCollectionService>();
+
+// Register Email Service
+builder.Services.AddScoped<EmailService>();
 
 // CORS Configuration
 builder.Services.AddCors(options =>
@@ -33,6 +37,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowAll");
+app.UseMiddleware<EmailNotificationMiddleware>(); 
 app.UseAuthorization();
 app.MapControllers();
 
