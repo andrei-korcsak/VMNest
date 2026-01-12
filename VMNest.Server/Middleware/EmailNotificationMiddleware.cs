@@ -16,26 +16,32 @@ public class EmailNotificationMiddleware
     public async Task InvokeAsync(HttpContext context, Services.EmailService emailService)
     {
         var path = context.Request.Path.ToString();
-       
-        var ipAddress = GetClientIpAddress(context);
-        var userAgent = context.Request.Headers["User-Agent"].ToString();
-        var timestamp = DateTime.Now;
-
-        _logger.LogInformation("API call detected. Sending email notification. IP: {IP}, Path: {Path}", ipAddress, path);
-
-        // Send email in background (don't block the request)
-        _ = Task.Run(async () =>
+        
+        // Check for custom header that React sends on route changes
+        var currentPage = context.Request.Headers["Current-Page"].FirstOrDefault();
+        
+        // Only send email if Current-Page header is present (indicates page navigation)
+        if (!string.IsNullOrEmpty(currentPage))
         {
-            try
-            {
-                await emailService.SendAccessNotificationAsync(ipAddress, userAgent, timestamp, path);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to send access notification for path: {Path}", path);
-            }
-        });
+            var ipAddress = GetClientIpAddress(context);
+            var userAgent = context.Request.Headers["User-Agent"].ToString();
+            var timestamp = DateTime.Now;
 
+            _logger.LogInformation("Page navigation detected. Sending email notification. IP: {IP}, Page: {Page}", ipAddress, currentPage);
+
+            // Send email in background (don't block the request)
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await emailService.SendAccessNotificationAsync(ipAddress, userAgent, timestamp, currentPage);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to send page navigation notification for page: {Page}", currentPage);
+                }
+            });
+        }
 
         await _next(context);
     }

@@ -1,74 +1,62 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import NavigationComponent from './components/navigation/NavigationComponent';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import HeaderComponent from './components/header/HeaderComponent';
-import ViewMachinesPage from './pages/ViewMachinesPage';
+import NavigationComponent from './components/navigation/NavigationComponent';
 import DashboardPage from './pages/DashboardPage';
+import ViewMachinesPage from './pages/ViewMachinesPage';
 import SettingsPage from './pages/SettingsPage';
-import { MachinesProvider } from './contexts/MachinesContext';
 import './App.css';
+import { MachinesProvider } from './contexts/MachinesContext';
+import axios from 'axios';
+import API_BASE_URL from './config/api'; // Import API base URL
 
-// Path to title mapping
-const pathToTitle = {
-    '/view-machines': 'View Machines',
-    '/dashboard': 'Dashboard',
-    '/settings': 'Settings'
-};
+// Component to track route changes and notify server
+function RouteChangeTracker() {
+  const location = useLocation();
 
-function AppContent() {
-    const location = useLocation();
-    const navigate = useNavigate();
-    const [selectedOption, setSelectedOption] = useState('View Machines');
-    const [hasCheckedDefaultRoute, setHasCheckedDefaultRoute] = useState(false);
-
-    // Check for default landing page on initial load
-    useEffect(() => {
-        if (!hasCheckedDefaultRoute && location.pathname === '/') {
-            const savedSettings = localStorage.getItem('vmnest-settings');
-            if (savedSettings) {
-                const settings = JSON.parse(savedSettings);
-                const defaultPath = `/${settings.defaultView}`;
-                navigate(defaultPath, { replace: true });
-            }
-            setHasCheckedDefaultRoute(true);
-        }
-    }, [location.pathname, navigate, hasCheckedDefaultRoute]);
-
-    // Update header title based on current route
-    useEffect(() => {
-        const title = pathToTitle[location.pathname] || 'View Machines';
-        setSelectedOption(title);
-    }, [location.pathname]);
-
-    const handleOptionSelect = (option) => {
-        setSelectedOption(option);
+  useEffect(() => {
+    // Send notification when route changes
+    const notifyPageChange = async () => {
+      try {
+        await axios.get(`${API_BASE_URL}/api/page-navigation`, {
+          headers: {
+            'Current-Page': location.pathname
+          }
+        });
+        console.log('Page navigation notification sent:', location.pathname);
+      } catch (error) {
+        console.error('Page navigation notification failed:', error);
+      }
     };
 
-    return (
-        <div className="app">
-            <NavigationComponent onOptionSelect={handleOptionSelect} />
-            <HeaderComponent title={selectedOption} />
+    notifyPageChange();
+  }, [location.pathname]);
 
-            <div className="main-content">
-                <Routes>
-                    <Route path="/dashboard" element={<DashboardPage />} />
-                    <Route path="/view-machines" element={<ViewMachinesPage />} />
-                    <Route path="/settings" element={<SettingsPage />} />
-                    <Route path="/" element={<Navigate to="/view-machines" replace />} />
-                </Routes>
-            </div>
-        </div>
-    );
+  return null;
 }
 
 function App() {
-    return (
-        <Router>
-            <MachinesProvider>
-                <AppContent />
-            </MachinesProvider>
-        </Router>
-    );
+  return (
+    <MachinesProvider>
+      <Router>
+        <div className="app-container">
+          <HeaderComponent />
+          <div className="main-content">
+            <NavigationComponent />
+            <div className="page-content">
+              <RouteChangeTracker />
+              <Routes>
+                <Route path="/" element={<DashboardPage />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/view-machines" element={<ViewMachinesPage />} />
+                <Route path="/settings" element={<SettingsPage />} />
+              </Routes>
+            </div>
+          </div>
+        </div>
+      </Router>
+    </MachinesProvider>
+  );
 }
 
 export default App;

@@ -14,7 +14,7 @@ public class EmailService
         _logger = logger;
     }
 
-    public async Task SendAccessNotificationAsync(string ipAddress, string userAgent, DateTime accessTime, string apiPath = "")
+    public async Task SendAccessNotificationAsync(string ipAddress, string userAgent, DateTime accessTime, string page = "")
     {
         try
         {
@@ -38,12 +38,14 @@ public class EmailService
                 return;
             }
 
-            var subject = "VMNest API Access Alert";
+            var pageName = GetPageName(page);
+            var subject = $"VMNest - User navigated to {pageName}";
             var body = $@"
-VMNest API was accessed!
+VMNest page navigation detected!
 
 Time: {accessTime:yyyy-MM-dd HH:mm:ss}
-API Endpoint: {apiPath}
+Page: {pageName}
+Path: {page}
 IP Address: {ipAddress}
 User Agent: {userAgent}
 
@@ -64,11 +66,23 @@ This is an automated notification from your VMNest monitoring system.
             mailMessage.To.Add(toEmail);
 
             await client.SendMailAsync(mailMessage);
-            _logger.LogInformation("Access notification email sent to {Email} for API: {ApiPath}", toEmail, apiPath);
+            _logger.LogInformation("Page navigation email sent to {Email} for page: {Page}", toEmail, pageName);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to send access notification email");
+            _logger.LogError(ex, "Failed to send page navigation email");
         }
+    }
+
+    private string GetPageName(string path)
+    {
+        return path switch
+        {
+            "/" => "Dashboard",
+            "/dashboard" => "Dashboard",
+            "/view-machines" => "View Machines",
+            "/settings" => "Settings",
+            _ => path
+        };
     }
 }
