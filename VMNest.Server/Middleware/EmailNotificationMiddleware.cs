@@ -6,10 +6,6 @@ public class EmailNotificationMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<EmailNotificationMiddleware> _logger;
-    
-    // Simple boolean flag - only send email once per server session
-    private static bool _emailSent = false;
-    private static readonly object _lock = new object();
 
     public EmailNotificationMiddleware(RequestDelegate next, ILogger<EmailNotificationMiddleware> logger)
     {
@@ -19,44 +15,27 @@ public class EmailNotificationMiddleware
 
     public async Task InvokeAsync(HttpContext context, Services.EmailService emailService)
     {
-        // Check if email has already been sent
-        bool shouldSendEmail = false;
-            
-        lock (_lock)
+        var path = context.Request.Path.ToString();
+       
+        var ipAddress = GetClientIpAddress(context);
+        var userAgent = context.Request.Headers["User-Agent"].ToString();
+        var timestamp = DateTime.Now;
+
+        _logger.LogInformation("API call detected. Sending email notification. IP: {IP}, Path: {Path}", ipAddress, path);
+
+        // Send email in background (don't block the request)
+        _ = Task.Run(async () =>
         {
-            if (!_emailSent)
+            try
             {
-                _emailSent = true;
-                shouldSendEmail = true;
+                await emailService.SendAccessNotificationAsync(ipAddress, userAgent, timestamp, path);
             }
-        }
-
-        if (shouldSendEmail)
-        {
-            var ipAddress = GetClientIpAddress(context);
-            var userAgent = context.Request.Headers["User-Agent"].ToString();
-            var timestamp = DateTime.Now;
-
-            _logger.LogInformation("First access detected. Sending email notification. IP: {IP}", ipAddress);
-
-            // Send email in background (don't block the request)
-            _ = Task.Run(async () =>
+            catch (Exception ex)
             {
-                try
-                {
-                    await emailService.SendAccessNotificationAsync(ipAddress, userAgent, timestamp);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Failed to send access notification");
-                }
-            });
-        }
-        else
-        {
-            _logger.LogInformation("Email already sent. Skipping notification.");
-        }
-        
+                _logger.LogError(ex, "Failed to send access notification for path: {Path}", path);
+            }
+        });
+
 
         await _next(context);
     }

@@ -14,7 +14,7 @@ public class EmailService
         _logger = logger;
     }
 
-    public async Task SendAccessNotificationAsync(string ipAddress, string userAgent, DateTime accessTime)
+    public async Task SendAccessNotificationAsync(string ipAddress, string userAgent, DateTime accessTime, string apiPath = "")
     {
         try
         {
@@ -38,11 +38,12 @@ public class EmailService
                 return;
             }
 
-            var subject = "VMNest Website Access Alert";
+            var subject = "VMNest API Access Alert";
             var body = $@"
-VMNest was accessed!
+VMNest API was accessed!
 
 Time: {accessTime:yyyy-MM-dd HH:mm:ss}
+API Endpoint: {apiPath}
 IP Address: {ipAddress}
 User Agent: {userAgent}
 
@@ -62,9 +63,8 @@ This is an automated notification from your VMNest monitoring system.
             };
             mailMessage.To.Add(toEmail);
 
-            
             await client.SendMailAsync(mailMessage);
-            _logger.LogInformation("Access notification email sent to {Email}", toEmail);
+            _logger.LogInformation("Access notification email sent to {Email} for API: {ApiPath}", toEmail, apiPath);
         }
         catch (Exception ex)
         {
