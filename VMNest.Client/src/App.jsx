@@ -17,16 +17,11 @@ function RouteChangeTracker() {
   useEffect(() => {
     // Send notification when route changes
     const notifyPageChange = async () => {
-      try {
         await axios.get(`${API_BASE_URL}/api/page-navigation`, {
           headers: {
             'Current-Page': location.pathname
           }
         });
-        console.log('Page navigation notification sent:', location.pathname);
-      } catch (error) {
-        console.error('Page navigation notification failed:', error);
-      }
     };
 
     notifyPageChange();
