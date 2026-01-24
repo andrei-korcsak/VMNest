@@ -25,7 +25,10 @@
 .navigation-logo {
     font-size: 24px;
     font-weight: bold;
-    margin-bottom: 20px;
+    margin-bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .navigation-options {
@@ -79,6 +82,7 @@
     width: 400px;
     height: auto;
     object-fit: contain;
+    display: block;
 }
 
 /* Close button - hidden on desktop */
@@ -117,6 +121,7 @@
         width: 85%;
         max-width: 320px;
         z-index: 1002;
+        padding-top: 40px;
     }
 
     /* Show navigation when menu is open - overlay on top */
@@ -151,26 +156,36 @@
         }
     }
 
-    /* Adjust logo size on mobile */
+    /* Larger logo on mobile - increased from 280px to 300px */
     .vmnest-logo {
-        width: 220px;
+        width: 300px; /* Increased from 280px (75% of 400px) */
+        display: block;
+    }
+    
+    .navigation-logo {
+        margin-bottom: 0;
     }
 
-    /* Adjust option font size on mobile */
+    /* Proportional font and padding scaling */
     .navigation-option {
         font-size: 20px;
-        padding: 12px 15px;
+        padding: 11px 14px;
     }
 
     .navigation-icon {
-        width: 25px;
-        height: 25px;
-        margin-right: 20px;
-        padding-left: 15px;
+        width: 21px;
+        height: 21px;
+        margin-right: 21px;
+        padding-left: 21px;
     }
 
     .navigation-top {
-        height: 100px;
+        height: 12.5%;
+        margin-top: 20px;
+    }
+
+    .navigation-options {
+        padding-top: 14px;
     }
 }
 
@@ -179,21 +194,31 @@
     .navigation {
         width: 90%;
         max-width: 280px;
+        padding-top: 30px;
     }
 
+    /* Larger logo on small mobile - increased from 240px to 260px */
     .vmnest-logo {
-        width: 180px;
+        width: 260px; /* Increased from 240px (65% of 400px) */
     }
 
     .navigation-option {
-        font-size: 18px;
-        padding: 10px 12px;
+        font-size: 17px;
+        padding: 9px 12px;
     }
 
     .navigation-icon {
-        width: 22px;
-        height: 22px;
-        margin-right: 15px;
-        padding-left: 10px;
+        width: 18px;
+        height: 18px;
+        margin-right: 18px;
+        padding-left: 18px;
+    }
+
+    .navigation-top {
+        margin-top: 15px;
+    }
+
+    .navigation-options {
+        padding-top: 12px;
     }
 }
