@@ -425,4 +425,107 @@
         width: 100%;
         justify-content: center;
     }
+
+    /* Make table horizontally scrollable on mobile */
+    .machines-table-card {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .view-machines-table {
+        min-width: 600px; /* Ensure table doesn't shrink too much */
+    }
+
+    .view-machines-table th,
+    .view-machines-table td {
+        padding: 12px 8px;
+        font-size: 13px;
+    }
+
+    .view-machines-table th {
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
+    /* Adjust column widths for mobile */
+    .checkbox-column {
+        width: 40px;
+    }
+
+    .id-column {
+        width: 50px;
+    }
+
+    .status-column {
+        width: 120px;
+    }
+
+    .status-badge {
+        padding: 4px 10px;
+        font-size: 12px;
+    }
+
+    .status-dot {
+        width: 6px;
+        height: 6px;
+        margin-right: 6px;
+    }
+
+    /* Pagination adjustments */
+    .pagination {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .pagination-button {
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+
+    .pagination-arrow {
+        padding: 8px 10px;
+    }
+}
+
+/* Extra small mobile devices */
+@media (max-width: 480px) {
+    .view-machines-container {
+        padding: 8px;
+    }
+
+    .search-container {
+        min-width: 100%;
+    }
+
+    .view-machines-search-bar {
+        font-size: 14px;
+        padding: 10px 14px 10px 40px;
+    }
+
+    .toolbar-button {
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+
+    .view-machines-table {
+        min-width: 550px; /* Slightly smaller for very small screens */
+    }
+
+    .view-machines-table th,
+    .view-machines-table td {
+        padding: 10px 6px;
+        font-size: 12px;
+    }
+
+    .summary-item {
+        padding: 6px 12px;
+    }
+
+    .summary-label {
+        font-size: 12px;
+    }
+
+    .summary-value {
+        font-size: 16px;
+    }
 }
