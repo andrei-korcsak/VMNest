@@ -16,7 +16,7 @@
 
 /* Hamburger menu button - HIDDEN on desktop */
 .header .hamburger-menu {
-    display: none; /* Explicitly hidden on desktop */
+    display: none;
 }
 
 .header .hamburger-menu span {
@@ -25,6 +25,7 @@
     background-color: white;
     transition: all 0.3s ease;
     border-radius: 2px;
+    display: block;
 }
 
 /* Hamburger animation when open */
@@ -156,16 +157,17 @@
         border-radius: 3px;
         transition: all 0.3s ease;
         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        display: block;
     }
 
-    /* Enhanced animation when open */
+    /* Enhanced animation when open - PERFECT X */
     .header .hamburger-menu.open {
         background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
         box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
     }
 
     .header .hamburger-menu.open span:nth-child(1) {
-        transform: rotate(45deg) translate(7px, 7px);
+        transform: translateY(8.5px) rotate(45deg);
     }
 
     .header .hamburger-menu.open span:nth-child(2) {
@@ -174,7 +176,7 @@
     }
 
     .header .hamburger-menu.open span:nth-child(3) {
-        transform: rotate(-45deg) translate(7px, -7px);
+        transform: translateY(-8.5px) rotate(-45deg);
     }
 
     .header-title {
@@ -185,8 +187,8 @@
     }
 
     .user-profile {
-        margin-right: 0;
-        padding: 6px 10px;
+        margin-right: 25px;
+        padding: 6px 15px 6px 10px;
         gap: 8px;
     }
 
@@ -230,12 +232,21 @@
         height: 2px;
     }
 
+    .header .hamburger-menu.open span:nth-child(1) {
+        transform: translateY(7px) rotate(45deg);
+    }
+
+    .header .hamburger-menu.open span:nth-child(3) {
+        transform: translateY(-7px) rotate(-45deg);
+    }
+
     .header-title {
         font-size: 16px;
     }
 
     .user-profile {
-        padding: 4px 8px;
+        margin-right: 25px;
+        padding: 4px 12px 4px 8px;
         gap: 6px;
     }
 
@@ -273,12 +284,21 @@
         height: 2px;
     }
 
+    .header .hamburger-menu.open span:nth-child(1) {
+        transform: translateY(6px) rotate(45deg);
+    }
+
+    .header .hamburger-menu.open span:nth-child(3) {
+        transform: translateY(-6px) rotate(-45deg);
+    }
+
     .header-title {
         font-size: 14px;
     }
 
     .user-profile {
-        padding: 4px;
+        margin-right: 8px; /* Reverted: back to 8px */
+        padding: 4px 8px 4px 4px;
         border: none;
         background: transparent;
     }

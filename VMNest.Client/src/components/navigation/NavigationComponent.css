@@ -81,7 +81,7 @@
     object-fit: contain;
 }
 
-/* Close button - for mobile menu */
+/* Close button - hidden on desktop */
 .close-menu {
     display: none;
     position: absolute;
@@ -104,14 +104,14 @@
     transform: scale(1.1);
 }
 
-/* Menu overlay */
+/* Menu overlay - hidden on desktop */
 .menu-overlay {
     display: none;
 }
 
 /* Mobile styles (768px and below) */
 @media (max-width: 768px) {
-    /* Hide navigation by default on mobile */
+    /* Hide navigation by default on mobile - slide from left */
     .navigation {
         transform: translateX(-100%);
         width: 85%;
@@ -119,7 +119,7 @@
         z-index: 1002;
     }
 
-    /* Show navigation when menu is open */
+    /* Show navigation when menu is open - overlay on top */
     .navigation.open {
         transform: translateX(0);
     }
@@ -195,19 +195,5 @@
         height: 22px;
         margin-right: 15px;
         padding-left: 10px;
-    }
-}
-
-/* Very small devices */
-@media (max-width: 360px) {
-    .hamburger-menu {
-        right: 40px;
-        padding: 8px;
-        top: 11px;
-    }
-
-    .hamburger-menu span {
-        width: 22px;
-        height: 2px;
     }
 }
