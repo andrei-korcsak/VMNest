@@ -81,45 +81,7 @@
     object-fit: contain;
 }
 
-/* Hamburger menu button - hidden on desktop */
-.hamburger-menu {
-    display: none;
-    flex-direction: column;
-    gap: 5px;
-    background: #2c3e50;
-    border: none;
-    padding: 12px;
-    cursor: pointer;
-    position: fixed;
-    top: 15px;
-    left: 15px;
-    z-index: 9999;
-    border-radius: 6px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-}
-
-.hamburger-menu span {
-    width: 28px;
-    height: 3px;
-    background-color: white;
-    transition: all 0.3s ease;
-    border-radius: 2px;
-}
-
-/* Hamburger animation when open */
-.hamburger-menu.open span:nth-child(1) {
-    transform: rotate(45deg) translate(8px, 8px);
-}
-
-.hamburger-menu.open span:nth-child(2) {
-    opacity: 0;
-}
-
-.hamburger-menu.open span:nth-child(3) {
-    transform: rotate(-45deg) translate(7px, -7px);
-}
-
-/* Close button - hidden on desktop */
+/* Close button - for mobile menu */
 .close-menu {
     display: none;
     position: absolute;
@@ -142,23 +104,14 @@
     transform: scale(1.1);
 }
 
-/* Menu overlay - hidden on desktop */
+/* Menu overlay */
 .menu-overlay {
     display: none;
 }
 
 /* Mobile styles (768px and below) */
 @media (max-width: 768px) {
-/*     Show hamburger button - positioned on left */
-    .hamburger-menu {
-        display: flex;
-        left: auto;
-        right: 85px;
-        top: 12px; 
-        z-index: 9999;
-    }
-
-/*     Hide navigation by default on mobile - slide from left */
+    /* Hide navigation by default on mobile */
     .navigation {
         transform: translateX(-100%);
         width: 85%;
@@ -166,17 +119,17 @@
         z-index: 1002;
     }
 
-/*     Show navigation when menu is open - overlay on top */
+    /* Show navigation when menu is open */
     .navigation.open {
         transform: translateX(0);
     }
 
-/*     Show close button on mobile */
+    /* Show close button on mobile */
     .close-menu {
         display: block;
     }
 
-/*     Show overlay when menu is open */
+    /* Show overlay when menu is open */
     .menu-overlay {
         display: block;
         position: fixed;
@@ -198,12 +151,12 @@
         }
     }
 
-/*     Adjust logo size on mobile */
+    /* Adjust logo size on mobile */
     .vmnest-logo {
         width: 220px;
     }
 
-/*     Adjust option font size on mobile */
+    /* Adjust option font size on mobile */
     .navigation-option {
         font-size: 20px;
         padding: 12px 15px;
@@ -242,16 +195,6 @@
         height: 22px;
         margin-right: 15px;
         padding-left: 10px;
-    }
-
-    .hamburger-menu {
-        top: 11px;  
-        right: 50px; 
-        padding: 10px;
-    }
-
-    .hamburger-menu span {
-        width: 24px;
     }
 }
 

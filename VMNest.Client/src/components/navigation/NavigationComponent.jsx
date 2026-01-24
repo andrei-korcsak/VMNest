@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './NavigationComponent.css';
 import VMNestLogo from '../../images/VMNest_processed.png';
@@ -7,9 +7,8 @@ import DashboardIcon from '../../images/dashboard_icon.png';
 import SettingsIcon from '../../images/settings_icon.png';
 import SignOutIcon from '../../images/sign_out_icon.png';
 
-function NavigationComponent({ onOptionSelect }) {
+function NavigationComponent({ isMenuOpen, onClose }) {
     const navigate = useNavigate();
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const options = [
         { label: 'View Machines', icon: ViewMachinesIcon, path: '/view-machines', disabled: false },
@@ -18,47 +17,27 @@ function NavigationComponent({ onOptionSelect }) {
         { label: 'Sign Out', icon: SignOutIcon, path: null, disabled: true },
     ];
 
-    const toggleMenu = () => {
-        setIsMenuOpen(!isMenuOpen);
-    };
-
-    const closeMenu = () => {
-        setIsMenuOpen(false);
-    };
-
     const handleNavigation = (option) => {
         if (option.disabled) {
-            return; // Prevent navigation if disabled
+            return;
         }
         
         if (option.path) {
-            navigate(option.path); // Navigate to the specified path
-        }
-        if (onOptionSelect) {
-            onOptionSelect(option.label); // Update the header title
+            navigate(option.path);
         }
         
         // Close menu after navigation on mobile
-        closeMenu();
+        if (onClose) {
+            onClose();
+        }
     };
 
     return (
         <>
-            {/* Hamburger button for mobile */}
-            <button
-                className={`hamburger-menu ${isMenuOpen ? 'open' : ''}`}
-                onClick={toggleMenu}
-                aria-label="Toggle menu"
-            >
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-
             {/* Navigation sidebar */}
             <div className={`navigation ${isMenuOpen ? 'open' : ''}`}>
                 {/* Close button for mobile */}
-                <button className="close-menu" onClick={closeMenu} aria-label="Close menu">
+                <button className="close-menu" onClick={onClose} aria-label="Close menu">
                     ×
                 </button>
 
@@ -82,7 +61,7 @@ function NavigationComponent({ onOptionSelect }) {
             </div>
 
             {/* Overlay for mobile menu */}
-            {isMenuOpen && <div className="menu-overlay" onClick={closeMenu}></div>}
+            {isMenuOpen && <div className="menu-overlay" onClick={onClose}></div>}
         </>
     );
 }

@@ -15,7 +15,6 @@ function RouteChangeTracker() {
   const location = useLocation();
 
   useEffect(() => {
-    // Send notification when route changes
     const notifyPageChange = async () => {
         await axios.get(`${API_BASE_URL}/api/page-navigation`, {
           headers: {
@@ -30,10 +29,11 @@ function RouteChangeTracker() {
   return null;
 }
 
-// Component to handle dynamic title based on route
+// Component to handle dynamic title and menu state
 function AppContent() {
   const location = useLocation();
   const [pageTitle, setPageTitle] = useState('Dashboard');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     // Update title based on current route
@@ -53,11 +53,26 @@ function AppContent() {
     }
   }, [location.pathname]);
 
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+  };
+
   return (
     <div className="app-container">
-      <HeaderComponent title={pageTitle} />
+      <HeaderComponent 
+        title={pageTitle} 
+        onMenuToggle={toggleMenu}
+        isMenuOpen={isMenuOpen}
+      />
       <div className="main-content">
-        <NavigationComponent />
+        <NavigationComponent 
+          isMenuOpen={isMenuOpen}
+          onClose={closeMenu}
+        />
         <div className="page-content">
           <RouteChangeTracker />
           <Routes>

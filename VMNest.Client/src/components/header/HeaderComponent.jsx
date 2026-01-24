@@ -1,10 +1,22 @@
 import React from 'react';
 import './HeaderComponent.css';
 
-function HeaderComponent({ title }) {
+function HeaderComponent({ title, onMenuToggle, isMenuOpen }) {
     return (
         <div className="header">
+            {/* Hamburger button */}
+            <button 
+                className={`hamburger-menu ${isMenuOpen ? 'open' : ''}`} 
+                onClick={onMenuToggle}
+                aria-label="Toggle menu"
+            >
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
             <h1 className="header-title">{title}</h1>
+            
             <div className="user-profile">
                 <div className="profile-picture">
                     <svg viewBox="0 0 24 24" fill="currentColor">
