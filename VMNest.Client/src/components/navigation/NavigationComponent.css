@@ -10,14 +10,18 @@
     top: 0;
     left: 0;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    transition: transform 0.3s ease;
 }
+
 .navigation-top {
     width: 100%;
-    height: 12.5%; /* 1/8th of the height */
+    height: 12.5%;
     display: flex;
     justify-content: center;
     align-items: center;
 }
+
 .navigation-logo {
     font-size: 24px;
     font-weight: bold;
@@ -26,7 +30,7 @@
 
 .navigation-options {
     width: 100%;
-    flex: 1; /* Take the remaining height */
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -75,4 +79,192 @@
     width: 400px;
     height: auto;
     object-fit: contain;
+}
+
+/* Hamburger menu button - hidden on desktop */
+.hamburger-menu {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: #2c3e50;
+    border: none;
+    padding: 12px;
+    cursor: pointer;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 9999;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.hamburger-menu span {
+    width: 28px;
+    height: 3px;
+    background-color: white;
+    transition: all 0.3s ease;
+    border-radius: 2px;
+}
+
+/* Hamburger animation when open */
+.hamburger-menu.open span:nth-child(1) {
+    transform: rotate(45deg) translate(8px, 8px);
+}
+
+.hamburger-menu.open span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger-menu.open span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -7px);
+}
+
+/* Close button - hidden on desktop */
+.close-menu {
+    display: none;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: transparent;
+    border: none;
+    color: darkslategray;
+    font-size: 40px;
+    cursor: pointer;
+    padding: 0;
+    width: 45px;
+    height: 45px;
+    line-height: 40px;
+    transition: transform 0.2s;
+    z-index: 1004;
+}
+
+.close-menu:hover {
+    transform: scale(1.1);
+}
+
+/* Menu overlay - hidden on desktop */
+.menu-overlay {
+    display: none;
+}
+
+/* Mobile styles (768px and below) */
+@media (max-width: 768px) {
+/*     Show hamburger button - positioned on left */
+    .hamburger-menu {
+        display: flex;
+        left: auto;
+        right: 85px;
+        top: 12px; 
+        z-index: 9999;
+    }
+
+/*     Hide navigation by default on mobile - slide from left */
+    .navigation {
+        transform: translateX(-100%);
+        width: 85%;
+        max-width: 320px;
+        z-index: 1002;
+    }
+
+/*     Show navigation when menu is open - overlay on top */
+    .navigation.open {
+        transform: translateX(0);
+    }
+
+/*     Show close button on mobile */
+    .close-menu {
+        display: block;
+    }
+
+/*     Show overlay when menu is open */
+    .menu-overlay {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1001;
+        animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+/*     Adjust logo size on mobile */
+    .vmnest-logo {
+        width: 220px;
+    }
+
+/*     Adjust option font size on mobile */
+    .navigation-option {
+        font-size: 20px;
+        padding: 12px 15px;
+    }
+
+    .navigation-icon {
+        width: 25px;
+        height: 25px;
+        margin-right: 20px;
+        padding-left: 15px;
+    }
+
+    .navigation-top {
+        height: 100px;
+    }
+}
+
+/* Extra small mobile devices */
+@media (max-width: 480px) {
+    .navigation {
+        width: 90%;
+        max-width: 280px;
+    }
+
+    .vmnest-logo {
+        width: 180px;
+    }
+
+    .navigation-option {
+        font-size: 18px;
+        padding: 10px 12px;
+    }
+
+    .navigation-icon {
+        width: 22px;
+        height: 22px;
+        margin-right: 15px;
+        padding-left: 10px;
+    }
+
+    .hamburger-menu {
+        top: 11px;  
+        right: 50px; 
+        padding: 10px;
+    }
+
+    .hamburger-menu span {
+        width: 24px;
+    }
+}
+
+/* Very small devices */
+@media (max-width: 360px) {
+    .hamburger-menu {
+        right: 40px;
+        padding: 8px;
+        top: 11px;
+    }
+
+    .hamburger-menu span {
+        width: 22px;
+        height: 2px;
+    }
 }

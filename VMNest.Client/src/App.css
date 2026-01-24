@@ -23,14 +23,39 @@ th, td {
 
 .main-content {
     position: absolute;
-    top: calc(12.5% + 25px); /* Add 15px margin from the top */
-    left: calc(375px + 25px); /* Add 15px margin from the left */
-    right: 25px; /* Add 15px margin from the right */
-    bottom: 25px; /* Add 15px margin from the bottom */
-    background-color: white; /* Optional: Set a background color */
+    top: calc(12.5% + 25px); /* Add 25px margin from the top */
+    left: calc(375px + 25px); /* Add 25px margin from the left */
+    right: 25px; /* Add 25px margin from the right */
+    bottom: 25px; /* Add 25px margin from the bottom */
+    background-color: white;
     color: black;
-    border-radius: 15px; /* Optional: Add rounded corners */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow */
-    box-sizing: border-box; /* Ensure padding doesn't affect dimensions */
-    overflow: auto; /* Handle content overflow */
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+    overflow: auto;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .main-content {
+        position: fixed; /* Changed to fixed for better mobile handling */
+        top: 60px; /* Room for hamburger button */
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        margin: 0 auto; /* Center horizontally */
+        border-radius: 10px;
+        overflow-y: auto;
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 480px) {
+    .main-content {
+        top: 50px;
+        left: 5px;
+        right: 5px;
+        bottom: 5px;
+        border-radius: 8px;
+    }
 }
